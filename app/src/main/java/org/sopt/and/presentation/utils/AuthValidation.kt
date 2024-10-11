@@ -20,6 +20,8 @@ object AuthValidation {
         inputPassword: String
     ): SignInState {
         return when {
+            inputEmail.isEmpty() -> SignInState.EmailEmpty
+            inputPassword.isEmpty() -> SignInState.PasswordEmpty
             userEmail != inputEmail -> SignInState.EmailInvalid
             userPassword != inputPassword -> SignInState.PasswordInvalid
             else -> SignInState.Success

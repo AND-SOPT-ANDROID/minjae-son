@@ -180,6 +180,14 @@ fun SignInScreen(
                     inputPassword = inputPassword
                 )
                 when (signInState) {
+                    is SignInState.EmailEmpty -> {
+                        showToast(context = context, message = "이메일을 입력해주세요")
+                    }
+
+                    is SignInState.PasswordEmpty -> {
+                        showToast(context = context, message = "비밀번호를 입력해주세요")
+                    }
+
                     is SignInState.EmailInvalid -> {
                         coroutineScope.launch {
                             val snackBarResult = snackBarHostState.showSnackbar(
