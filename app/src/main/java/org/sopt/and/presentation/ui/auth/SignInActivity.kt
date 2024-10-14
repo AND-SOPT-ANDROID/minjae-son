@@ -53,6 +53,7 @@ import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
 import org.sopt.and.presentation.ui.main.MainActivity
 import org.sopt.and.presentation.utils.AuthValidation
+import org.sopt.and.presentation.utils.KeyStorage
 import org.sopt.and.presentation.utils.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
@@ -82,8 +83,8 @@ class SignInActivity : ComponentActivity() {
     }
 
     private fun getUserInfo() {
-        userEmail = intent.getStringExtra("email").orEmpty()
-        userPassword = intent.getStringExtra("password").orEmpty()
+        userEmail = intent.getStringExtra(KeyStorage.USER_EMAIL).orEmpty()
+        userPassword = intent.getStringExtra(KeyStorage.USER_PASSWORD).orEmpty()
     }
 
     private fun navigateToSignUp() {
@@ -93,8 +94,8 @@ class SignInActivity : ComponentActivity() {
 
     private fun navigateToMain(userEmail: String, userPassword: String) {
         val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra("email", userEmail)
-            putExtra("password", userPassword)
+            putExtra(KeyStorage.USER_EMAIL, userEmail)
+            putExtra(KeyStorage.USER_PASSWORD, userPassword)
         }
         startActivity(intent)
     }

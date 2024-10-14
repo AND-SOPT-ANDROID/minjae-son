@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.sp
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
 import org.sopt.and.presentation.utils.AuthValidation
+import org.sopt.and.presentation.utils.KeyStorage
 import org.sopt.and.presentation.utils.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
@@ -68,8 +69,8 @@ class SignUpActivity : ComponentActivity() {
 
     private fun navigateToSignInWithInfo(email: String, password: String) {
         val intent = Intent(this@SignUpActivity, SignInActivity::class.java).apply {
-            putExtra("email", email)
-            putExtra("password", password)
+            putExtra(KeyStorage.USER_EMAIL, email)
+            putExtra(KeyStorage.USER_PASSWORD, password)
         }
         startActivity(intent)
     }

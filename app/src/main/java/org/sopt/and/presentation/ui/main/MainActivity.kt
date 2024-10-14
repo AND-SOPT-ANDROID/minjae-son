@@ -31,13 +31,14 @@ import org.sopt.and.R
 import org.sopt.and.presentation.ui.main.screen.HomeScreen
 import org.sopt.and.presentation.ui.main.screen.MyPageScreen
 import org.sopt.and.presentation.ui.main.screen.SearchScreen
+import org.sopt.and.presentation.utils.KeyStorage
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val userEmail = intent.getStringExtra("email").orEmpty()
-        val userPassword = intent.getStringExtra("password").orEmpty()
+        val userEmail = intent.getStringExtra(KeyStorage.USER_EMAIL).orEmpty()
+        val userPassword = intent.getStringExtra(KeyStorage.USER_PASSWORD).orEmpty()
         enableEdgeToEdge()
         setContent {
             ANDANDROIDTheme {
