@@ -36,8 +36,8 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val userEmail = intent.getStringExtra("email") ?: ""
-        val userPassword = intent.getStringExtra("password") ?: ""
+        val userEmail = intent.getStringExtra("email").orEmpty()
+        val userPassword = intent.getStringExtra("password").orEmpty()
         enableEdgeToEdge()
         setContent {
             ANDANDROIDTheme {

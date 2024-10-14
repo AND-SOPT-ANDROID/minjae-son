@@ -82,8 +82,8 @@ class SignInActivity : ComponentActivity() {
     }
 
     private fun getUserInfo() {
-        userEmail = intent.getStringExtra("email") ?: ""
-        userPassword = intent.getStringExtra("password") ?: ""
+        userEmail = intent.getStringExtra("email").orEmpty()
+        userPassword = intent.getStringExtra("password").orEmpty()
     }
 
     private fun navigateToSignUp() {
