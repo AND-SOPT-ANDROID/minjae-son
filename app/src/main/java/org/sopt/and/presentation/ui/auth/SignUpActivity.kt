@@ -56,23 +56,30 @@ class SignUpActivity : ComponentActivity() {
             ANDANDROIDTheme {
                 SignUpScreen(
                     navigateToSignIn = { navigateToSignIn() },
-                    navigateToSignInWithInfo = { email, password -> navigateToSignInWithInfo(email, password) }
+                    navigateToSignInWithInfo = { email, password ->
+                        navigateToSignInWithInfo(
+                            email,
+                            password
+                        )
+                    }
                 )
             }
         }
     }
 
     private fun navigateToSignIn() {
-        val intent = Intent(this@SignUpActivity, SignInActivity::class.java)
-        startActivity(intent)
+        startActivity(
+            Intent(this@SignUpActivity, SignInActivity::class.java)
+        )
     }
 
     private fun navigateToSignInWithInfo(email: String, password: String) {
-        val intent = Intent(this@SignUpActivity, SignInActivity::class.java).apply {
-            putExtra(KeyStorage.USER_EMAIL, email)
-            putExtra(KeyStorage.USER_PASSWORD, password)
-        }
-        startActivity(intent)
+        startActivity(
+            Intent(this@SignUpActivity, SignInActivity::class.java).apply {
+                putExtra(KeyStorage.USER_EMAIL, email)
+                putExtra(KeyStorage.USER_PASSWORD, password)
+            }
+        )
     }
 }
 
@@ -315,7 +322,7 @@ fun SignUpPreview() {
     ANDANDROIDTheme {
         SignUpScreen(
             navigateToSignIn = {},
-            navigateToSignInWithInfo = { _, _ ->  }
+            navigateToSignInWithInfo = { _, _ -> }
         )
     }
 }

@@ -88,16 +88,21 @@ class SignInActivity : ComponentActivity() {
     }
 
     private fun navigateToSignUp() {
-        val intent = Intent(this, SignUpActivity::class.java)
-        startActivity(intent)
+        startActivity(
+            Intent(this, SignUpActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
     }
 
     private fun navigateToMain(userEmail: String, userPassword: String) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra(KeyStorage.USER_EMAIL, userEmail)
-            putExtra(KeyStorage.USER_PASSWORD, userPassword)
-        }
-        startActivity(intent)
+        startActivity(
+            Intent(this, MainActivity::class.java).apply {
+                putExtra(KeyStorage.USER_EMAIL, userEmail)
+                putExtra(KeyStorage.USER_PASSWORD, userPassword)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+        )
     }
 }
 
