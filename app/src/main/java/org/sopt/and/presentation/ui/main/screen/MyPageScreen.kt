@@ -30,7 +30,7 @@ import org.sopt.and.R
 @Composable
 fun MyPageScreen(
     paddingValues: PaddingValues,
-    email: String = ""
+    userEmail: String
 ) {
     Column(
         modifier = Modifier
@@ -55,7 +55,7 @@ fun MyPageScreen(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = email + "님",
+                text = "${userEmail}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(1f))
@@ -94,7 +94,7 @@ fun MyPageScreen(
                     color = Color(0xFFCCCCCC)
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.img_mypage_arrow_forward),
+                    painter = painterResource(id = R.drawable.img_arrow_forward),
                     contentDescription = "",
                     modifier = Modifier.size(24.dp)
                 )
@@ -122,7 +122,7 @@ fun MyPageScreen(
                     color = Color(0xFFCCCCCC)
                 )
                 Image(
-                    painter = painterResource(id = R.drawable.img_mypage_arrow_forward),
+                    painter = painterResource(id = R.drawable.img_arrow_forward),
                     contentDescription = "",
                     modifier = Modifier.size(24.dp)
                 )

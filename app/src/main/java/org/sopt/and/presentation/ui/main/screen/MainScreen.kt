@@ -1,10 +1,7 @@
-package org.sopt.and.presentation.ui.main
+package org.sopt.and.presentation.ui.main.screen
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -27,30 +24,23 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.main.screen.HomeScreen
-import org.sopt.and.presentation.ui.main.screen.MyPageScreen
-import org.sopt.and.presentation.ui.main.screen.SearchScreen
-import org.sopt.and.presentation.utils.KeyStorage
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        val userEmail = intent.getStringExtra(KeyStorage.USER_EMAIL).orEmpty()
-        val userPassword = intent.getStringExtra(KeyStorage.USER_PASSWORD).orEmpty()
-        enableEdgeToEdge()
-        setContent {
-            ANDANDROIDTheme {
-                MainScreen(email = userEmail)
-            }
-        }
-    }
+@Composable
+fun MainRoute(
+    navController: NavHostController,
+    userEmail: String,
+) {
+    MainScreen(
+        userEmail = userEmail
+    )
 }
 
 @Composable
 fun MainScreen(
-    email: String
+    userEmail: String
 ) {
     var isHomeSelected by remember { mutableStateOf(true) }
     var isSearchSelected by remember { mutableStateOf(false) }
@@ -78,6 +68,7 @@ fun MainScreen(
         bottomBar = {
             NavigationBar(
                 containerColor = Color.Black,
+                windowInsets = WindowInsets(0.dp,0.dp,0.dp,0.dp),
                 content = {
                     NavigationBarItem(
                         selected = isHomeSelected,
@@ -161,13 +152,14 @@ fun MainScreen(
             )
         },
         containerColor = Color.Black,
+        contentWindowInsets = WindowInsets(0.dp,0.dp,0.dp,0.dp),
         content = { innerPadding ->
             when {
                 isHomeSelected -> HomeScreen(innerPadding)
                 isSearchSelected -> SearchScreen(innerPadding)
                 isMyPageSelected -> MyPageScreen(
                     paddingValues = innerPadding,
-                    email = email
+                    userEmail = userEmail
                 )
             }
         }
@@ -179,6 +171,6 @@ fun MainScreen(
 @Composable
 fun MyPagePreview() {
     ANDANDROIDTheme {
-        MainScreen(email = "")
+
     }
 }
