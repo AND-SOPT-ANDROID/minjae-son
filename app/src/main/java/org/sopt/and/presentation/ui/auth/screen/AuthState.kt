@@ -1,4 +1,4 @@
-package org.sopt.and.presentation.ui.auth
+package org.sopt.and.presentation.ui.auth.screen
 
 sealed class SignInState {
     data object Idle : SignInState()
