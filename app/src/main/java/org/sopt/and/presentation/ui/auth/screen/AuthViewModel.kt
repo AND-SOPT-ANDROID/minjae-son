@@ -31,14 +31,13 @@ class AuthViewModel @Inject constructor() : ViewModel() {
         inputEmail: String,
         inputPassword: String
     ): SignInState {
-//        return when {
-//            inputEmail.isEmpty() -> SignInState.EmailEmpty
-//            inputPassword.isEmpty() -> SignInState.PasswordEmpty
-//            _authEmail.value != inputEmail -> SignInState.EmailInvalid
-//            _authPassword.value != inputPassword -> SignInState.PasswordInvalid
-//            else -> SignInState.Success
-//        }
-        return SignInState.Success
+        return when {
+            inputEmail.isEmpty() -> SignInState.EmailEmpty
+            inputPassword.isEmpty() -> SignInState.PasswordEmpty
+            _authEmail.value != inputEmail -> SignInState.EmailInvalid
+            _authPassword.value != inputPassword -> SignInState.PasswordInvalid
+            else -> SignInState.Success
+        }
     }
 
     fun updateSignInState(newState: SignInState) {
