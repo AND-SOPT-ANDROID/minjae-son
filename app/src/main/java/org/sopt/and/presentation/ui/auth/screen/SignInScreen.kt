@@ -1,10 +1,5 @@
-package org.sopt.and.presentation.ui.auth
+package org.sopt.and.presentation.ui.auth.screen
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,15 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -31,6 +22,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,92 +41,59 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
-import org.sopt.and.presentation.ui.main.MainActivity
-import org.sopt.and.presentation.utils.AuthValidation
-import org.sopt.and.presentation.utils.KeyStorage
+import org.sopt.and.presentation.ui.auth.navigation.navigateToSignUp
+import org.sopt.and.presentation.ui.main.navigation.navigateToMain
 import org.sopt.and.presentation.utils.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-class SignInActivity : ComponentActivity() {
-    private lateinit var userEmail: String
-    private lateinit var userPassword: String
+@Composable
+fun SignInRoute(
+    navController: NavHostController,
+    authViewModel: AuthViewModel,
+) {
+    val signInState by authViewModel.signInState.collectAsState()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        getUserInfo()
-        enableEdgeToEdge()
-        setContent {
-            ANDANDROIDTheme {
-                SignInScreen(
-                    userEmail = userEmail,
-                    userPassword = userPassword,
-                    navigateToSignUp = { navigateToSignUp() },
-                    navigateToMain = { userEmail, userPassword ->
-                        navigateToMain(
-                            userEmail,
-                            userPassword
-                        )
-                    }
-                )
-            }
-        }
-    }
-
-    private fun getUserInfo() {
-        userEmail = intent.getStringExtra(KeyStorage.USER_EMAIL).orEmpty()
-        userPassword = intent.getStringExtra(KeyStorage.USER_PASSWORD).orEmpty()
-    }
-
-    private fun navigateToSignUp() {
-        startActivity(
-            Intent(this, SignUpActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        )
-    }
-
-    private fun navigateToMain(userEmail: String, userPassword: String) {
-        startActivity(
-            Intent(this, MainActivity::class.java).apply {
-                putExtra(KeyStorage.USER_EMAIL, userEmail)
-                putExtra(KeyStorage.USER_PASSWORD, userPassword)
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            }
-        )
-    }
+    SignInScreen(
+        authViewModel = authViewModel,
+        signInState = signInState,
+        navigateToSignUp = { navController.navigateToSignUp() },
+        navigateToMain = { userEmail -> navController.navigateToMain(userEmail) },
+    )
 }
 
 @Composable
 fun SignInScreen(
-    userEmail: String,
-    userPassword: String,
+    authViewModel: AuthViewModel,
+    signInState: SignInState,
     navigateToSignUp: () -> Unit,
-    navigateToMain: (String, String) -> Unit
+    navigateToMain: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
-    val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-    lateinit var signInState: SignInState
+
+    LaunchedEffect(inputEmail,inputPassword) {
+        authViewModel.updateSignInState(authViewModel.isSignInValid(inputEmail,inputPassword))
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF161616))
-            .padding(horizontal = 20.dp)
-            .padding(WindowInsets.statusBars.asPaddingValues())
-            .padding(WindowInsets.navigationBars.asPaddingValues()),
+            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()
         ) {
             Image(
-                painter = painterResource(id = R.drawable.img_signin_arrow_back),
+                painter = painterResource(id = R.drawable.img_arrow_back),
                 contentDescription = "",
                 modifier = Modifier
                     .align(Alignment.CenterStart)
@@ -179,12 +139,6 @@ fun SignInScreen(
 
         Button(
             onClick = {
-                signInState = AuthValidation.isSignInValid(
-                    userEmail = userEmail,
-                    userPassword = userPassword,
-                    inputEmail = inputEmail,
-                    inputPassword = inputPassword
-                )
                 when (signInState) {
                     is SignInState.EmailEmpty -> {
                         showToast(context = context, message = "이메일을 입력해주세요")
@@ -230,7 +184,7 @@ fun SignInScreen(
 
                     is SignInState.Success -> {
                         showToast(context = context, message = "로그인 성공")
-                        navigateToMain(userEmail, userPassword)
+                        navigateToMain(authViewModel.authEmail.value.toString())
                     }
 
                     else -> {}
@@ -372,11 +326,6 @@ fun PlatformSignInButton(
 @Composable
 fun SignInPreview() {
     ANDANDROIDTheme {
-        SignInScreen(
-            userEmail = "",
-            userPassword = "",
-            navigateToSignUp = {},
-            navigateToMain = { _, _ -> }
-        )
+
     }
 }
