@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     // Hilt 관련 의존성 추가
     implementation(libs.hilt.android)
+    implementation(libs.hilt.navigation.compose)
     implementation(libs.androidx.appcompat)
     kapt(libs.hilt.compiler)
     testImplementation(libs.junit)
