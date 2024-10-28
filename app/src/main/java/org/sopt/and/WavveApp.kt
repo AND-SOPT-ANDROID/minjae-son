@@ -9,12 +9,6 @@ import dagger.hilt.android.HiltAndroidApp
 class WavveApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        appContext = applicationContext
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-    }
-
-    companion object {
-        lateinit var appContext: Context
-            private set
     }
 }
