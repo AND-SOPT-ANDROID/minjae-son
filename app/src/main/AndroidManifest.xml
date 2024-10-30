@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".WavveApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -13,27 +14,16 @@
         android:theme="@style/Theme.ANDANDROID"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.ui.auth.SignInActivity"
+            android:name=".presentation.ui.WavveActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.ANDANDROID"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.ANDANDROID">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".presentation.ui.auth.SignUpActivity"
-            android:exported="false"
-            android:screenOrientation="portrait">
-        </activity>
-        <activity
-            android:name=".presentation.ui.main.MainActivity"
-            android:exported="false"
-            android:screenOrientation="portrait">
-
         </activity>
     </application>
 

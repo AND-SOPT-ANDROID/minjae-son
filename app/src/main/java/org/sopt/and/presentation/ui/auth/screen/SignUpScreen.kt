@@ -1,10 +1,5 @@
-package org.sopt.and.presentation.ui.auth
+package org.sopt.and.presentation.ui.auth.screen
 
-import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,15 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,52 +32,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
-import org.sopt.and.presentation.utils.AuthValidation
-import org.sopt.and.presentation.utils.KeyStorage
+import org.sopt.and.presentation.ui.auth.navigation.navigateToSignIn
 import org.sopt.and.presentation.utils.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
-class SignUpActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ANDANDROIDTheme {
-                SignUpScreen(
-                    navigateToSignIn = { navigateToSignIn() },
-                    navigateToSignInWithInfo = { email, password ->
-                        navigateToSignInWithInfo(
-                            email,
-                            password
-                        )
-                    }
-                )
-            }
-        }
-    }
-
-    private fun navigateToSignIn() {
-        startActivity(
-            Intent(this@SignUpActivity, SignInActivity::class.java)
-        )
-    }
-
-    private fun navigateToSignInWithInfo(email: String, password: String) {
-        startActivity(
-            Intent(this@SignUpActivity, SignInActivity::class.java).apply {
-                putExtra(KeyStorage.USER_EMAIL, email)
-                putExtra(KeyStorage.USER_PASSWORD, password)
-            }
-        )
-    }
+@Composable
+fun SignUpRoute(
+    authViewModel: AuthViewModel,
+    navController: NavHostController,
+) {
+    SignUpScreen(
+        authViewModel = authViewModel,
+        navigateToSignIn = { navController.navigateToSignIn() },
+        navigateBack = { navController.popBackStack() },
+    )
 }
 
 @Composable
 fun SignUpScreen(
+    authViewModel: AuthViewModel,
     navigateToSignIn: () -> Unit,
-    navigateToSignInWithInfo: (String, String) -> Unit
+    navigateBack: () -> Unit,
 ) {
     val context = LocalContext.current
     var inputEmail by remember { mutableStateOf("") }
@@ -94,7 +63,7 @@ fun SignUpScreen(
     var isSignUpValid by remember { mutableStateOf(false) }
 
     LaunchedEffect(inputEmail, inputPassword) {
-        isSignUpValid = AuthValidation.isSignUpValid(inputEmail, inputPassword)
+        isSignUpValid = authViewModel.isSignUpValid(inputEmail, inputPassword)
     }
 
     Column(
@@ -105,9 +74,7 @@ fun SignUpScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
-                .padding(WindowInsets.statusBars.asPaddingValues())
-                .padding(WindowInsets.navigationBars.asPaddingValues()),
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -124,7 +91,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .size(40.dp)
-                        .clickable(onClick = navigateToSignIn)
+                        .clickable(onClick = navigateBack)
                 )
             }
 
@@ -296,13 +263,13 @@ fun SignUpScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(WindowInsets.navigationBars.asPaddingValues())
                 .background(color = if (isSignUpValid) Color(0xFF0F42C7) else Color.Gray)
                 .clickable(
                     enabled = isSignUpValid,
                     onClick = {
                         showToast(context = context, message = "회원가입에 성공했습니다")
-                        navigateToSignInWithInfo(inputEmail, inputPassword)
+                        authViewModel.setAuthInfo(inputEmail, inputPassword)
+                        navigateToSignIn()
                     }
                 ),
             contentAlignment = Alignment.Center
@@ -320,9 +287,6 @@ fun SignUpScreen(
 @Composable
 fun SignUpPreview() {
     ANDANDROIDTheme {
-        SignUpScreen(
-            navigateToSignIn = {},
-            navigateToSignInWithInfo = { _, _ -> }
-        )
+
     }
 }
