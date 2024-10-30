@@ -86,7 +86,7 @@ fun SignInScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF161616))
-            .padding(horizontal = 20.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
