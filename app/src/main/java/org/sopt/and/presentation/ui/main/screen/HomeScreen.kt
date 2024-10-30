@@ -152,7 +152,7 @@ fun HomeHorizontalBanner(
     HorizontalPager(
         state = pagerState,
         modifier = Modifier
-            .width((LocalConfiguration.current.screenHeightDp * 0.85).dp)
+            .width((LocalConfiguration.current.screenWidthDp * 0.85).dp)
             .height((LocalConfiguration.current.screenHeightDp * 0.6).dp)
             .clip(RoundedCornerShape(12.dp)),
     ) { page ->
