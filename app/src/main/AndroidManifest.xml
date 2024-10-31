@@ -14,7 +14,7 @@
         android:theme="@style/Theme.ANDANDROID"
         tools:targetApi="31">
         <activity
-            android:name=".presentation.ui.WavveActivity"
+            android:name=".presentation.ui.navigation.WavveActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
