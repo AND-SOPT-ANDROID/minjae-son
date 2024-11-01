@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +36,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
+import org.sopt.and.presentation.ui.auth.component.SocialSignInList
+import org.sopt.and.presentation.ui.auth.component.SocialSignInRow
 import org.sopt.and.presentation.ui.auth.navigation.navigateToSignIn
 import org.sopt.and.presentation.utils.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
@@ -44,27 +47,46 @@ fun SignUpRoute(
     authViewModel: AuthViewModel,
     navController: NavHostController,
 ) {
+    val context = LocalContext.current
+    val signUpState by authViewModel.signUpState.collectAsState()
+
+    val onSignUpClick: (String, String) -> Unit = { email, password ->
+        authViewModel.validateSignUp(email, password)
+        when (signUpState) {
+            is SignUpState.EmailInvalid -> showToast(
+                context = context,
+                message = "아이디가 잘못된 형식입니다"
+            )
+
+            is SignUpState.PasswordInvalid -> showToast(
+                context = context,
+                message = "비밀번호가 잘못된 형식입니다"
+            )
+
+            is SignUpState.Success -> {
+                showToast(context = context, message = "회원가입에 성공했습니다.")
+                navController.navigateToSignIn()
+            }
+
+            else -> {}
+        }
+    }
+    val onCancelClick: () -> Unit = { navController.popBackStack() }
+
     SignUpScreen(
-        authViewModel = authViewModel,
-        navigateToSignIn = { navController.navigateToSignIn() },
-        navigateBack = { navController.popBackStack() },
+        onSignUpClick = onSignUpClick,
+        onCancelClick = onCancelClick,
     )
 }
 
 @Composable
 fun SignUpScreen(
-    authViewModel: AuthViewModel,
-    navigateToSignIn: () -> Unit,
-    navigateBack: () -> Unit,
+    onSignUpClick: (String, String) -> Unit,
+    onCancelClick: () -> Unit,
 ) {
-    val context = LocalContext.current
+
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
-    var isSignUpValid by remember { mutableStateOf(false) }
-
-    LaunchedEffect(inputEmail, inputPassword) {
-        isSignUpValid = authViewModel.isSignUpValid(inputEmail, inputPassword)
-    }
 
     Column(
         modifier = Modifier
@@ -91,7 +113,7 @@ fun SignUpScreen(
                     modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .size(40.dp)
-                        .clickable(onClick = navigateBack)
+                        .clickable(onClick = onCancelClick)
                 )
             }
 
@@ -197,11 +219,11 @@ fun SignUpScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
+                HorizontalDivider(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(color = Color(0xFF2F2F2F))
+                        .weight(1f),
+                    thickness = 1.dp,
+                    color = Color(0xFF2F2F2F)
                 )
                 Text(
                     text = "또는 다른 서비스 계정으로 로그인",
@@ -212,24 +234,19 @@ fun SignUpScreen(
                     textAlign = TextAlign.Center,
                     color = Color(0xFF848484)
                 )
-                Box(
+                HorizontalDivider(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(1.dp)
-                        .background(color = Color(0xFF2F2F2F))
+                        .weight(1f),
+                    thickness = 1.dp,
+                    color = Color(0xFF2F2F2F)
                 )
             }
 
-            Row(
-                modifier = Modifier.padding(vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                PlatformSignInButton(id = R.drawable.img_auth_kakao)
-                PlatformSignInButton(id = R.drawable.img_auth_skt)
-                PlatformSignInButton(id = R.drawable.img_auth_naver)
-                PlatformSignInButton(id = R.drawable.img_auth_facebook)
-                PlatformSignInButton(id = R.drawable.img_auth_apple)
-            }
+            SocialSignInRow(
+                images = SocialSignInList,
+                onClick = {}
+            )
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -263,14 +280,9 @@ fun SignUpScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = if (isSignUpValid) Color(0xFF0F42C7) else Color.Gray)
+                .background(color = Color(0xFF0F42C7))
                 .clickable(
-                    enabled = isSignUpValid,
-                    onClick = {
-                        showToast(context = context, message = "회원가입에 성공했습니다")
-                        authViewModel.setAuthInfo(inputEmail, inputPassword)
-                        navigateToSignIn()
-                    }
+                    onClick = { onSignUpClick(inputEmail, inputPassword) }
                 ),
             contentAlignment = Alignment.Center
         ) {
