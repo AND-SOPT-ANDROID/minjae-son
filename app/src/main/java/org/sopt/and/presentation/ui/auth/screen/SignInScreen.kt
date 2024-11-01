@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
-import org.sopt.and.presentation.ui.auth.component.SocialSignInList
-import org.sopt.and.presentation.ui.auth.component.SocialSignInRow
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.navigation.navigateToSignUp
 import org.sopt.and.presentation.ui.main.navigation.navigateToMain
 import org.sopt.and.presentation.utils.showToast
@@ -211,8 +211,8 @@ fun SignInScreen(
             )
         }
 
-        SocialSignInRow(
-            images = SocialSignInList,
+        SocialPlatformIconRow(
+            images = SocialPlatformList,
             onClick = {}
         )
 

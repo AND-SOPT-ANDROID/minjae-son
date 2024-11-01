@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import org.sopt.and.R
 
 @Composable
-fun SocialSignInRow(
+fun SocialPlatformIconRow(
     images: List<Int>,
     onClick: () -> Unit = {}
 ) {
@@ -39,7 +39,7 @@ fun SocialSignInRow(
     }
 }
 
-val SocialSignInList = listOf(
+val SocialPlatformList = listOf(
     R.drawable.img_auth_kakao,
     R.drawable.img_auth_skt,
     R.drawable.img_auth_naver,
