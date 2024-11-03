@@ -63,3 +63,23 @@ fun HomeContentDisplayRow(
         }
     }
 }
+
+val bannerImages = listOf(
+    R.drawable.img_home_banner_1,
+    R.drawable.img_home_banner_2,
+    R.drawable.img_home_banner_3
+)
+
+val editorRecommendationImages = listOf(
+    R.drawable.img_editor_recommendation_1,
+    R.drawable.img_editor_recommendation_2,
+    R.drawable.img_editor_recommendation_3,
+    R.drawable.img_editor_recommendation_4
+)
+
+val todayTop20Images = listOf(
+    R.drawable.img_today_top20_1,
+    R.drawable.img_today_top20_2,
+    R.drawable.img_today_top20_3,
+    R.drawable.img_today_top20_4
+)

@@ -37,6 +37,9 @@ import org.sopt.and.R
 import org.sopt.and.presentation.ui.main.component.CategoryItem
 import org.sopt.and.presentation.ui.main.component.HomeCategory
 import org.sopt.and.presentation.ui.main.component.HomeContentDisplayRow
+import org.sopt.and.presentation.ui.main.component.bannerImages
+import org.sopt.and.presentation.ui.main.component.editorRecommendationImages
+import org.sopt.and.presentation.ui.main.component.todayTop20Images
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
@@ -138,7 +141,7 @@ fun HomeHorizontalBanner(
 ) {
     val pagerState = rememberPagerState(
         initialPage = Int.MAX_VALUE / 2,
-        pageCount = {Int.MAX_VALUE}
+        pageCount = { Int.MAX_VALUE }
     )
 
     LaunchedEffect(pagerState) {
@@ -186,29 +189,6 @@ fun HomeHorizontalBanner(
         }
     }
 }
-
-
-
-val bannerImages = listOf(
-    R.drawable.img_home_banner_1,
-    R.drawable.img_home_banner_2,
-    R.drawable.img_home_banner_3
-)
-
-val editorRecommendationImages = listOf(
-    R.drawable.img_editor_recommendation_1,
-    R.drawable.img_editor_recommendation_2,
-    R.drawable.img_editor_recommendation_3,
-    R.drawable.img_editor_recommendation_4
-)
-
-val todayTop20Images = listOf(
-    R.drawable.img_today_top20_1,
-    R.drawable.img_today_top20_2,
-    R.drawable.img_today_top20_3,
-    R.drawable.img_today_top20_4
-)
-
 
 @Preview(showBackground = true)
 @Composable

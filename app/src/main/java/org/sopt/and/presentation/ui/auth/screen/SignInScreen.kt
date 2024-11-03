@@ -12,22 +12,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,9 +37,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.navigation.navigateToSignUp
 import org.sopt.and.presentation.ui.main.navigation.navigateToMain
 import org.sopt.and.presentation.utils.showToast
@@ -55,32 +51,46 @@ fun SignInRoute(
     navController: NavHostController,
     authViewModel: AuthViewModel,
 ) {
+    val context = LocalContext.current
     val signInState by authViewModel.signInState.collectAsState()
 
+    val onSignUpClick = { navController.navigateToSignUp() }
+    val onSignInClick: (String, String) -> Unit = { email, password ->
+        authViewModel.validateSignIn(email, password)
+    }
+
+    LaunchedEffect(signInState) {
+        when (signInState) {
+            is SignInState.EmailEmpty -> showToast(context = context, message = "이메일을 입력하세요")
+            is SignInState.PasswordEmpty -> showToast(context = context, message = "비밀번호를 입력하세요")
+            is SignInState.EmailInvalid -> showToast(context = context, message = "이메일이 일치하지 않습니다")
+            is SignInState.PasswordInvalid -> showToast(
+                context = context,
+                message = "비밀번호가 일치하지 않습니다"
+            )
+
+            is SignInState.Success -> {
+                showToast(context = context, message = "로그인에 성공했습니다")
+                navController.navigateToMain(authViewModel.user.value?.email.orEmpty())
+            }
+
+            else -> {}
+        }
+    }
+
     SignInScreen(
-        authViewModel = authViewModel,
-        signInState = signInState,
-        navigateToSignUp = { navController.navigateToSignUp() },
-        navigateToMain = { userEmail -> navController.navigateToMain(userEmail) },
+        onSignUpClick = onSignUpClick,
+        onSignInClick = onSignInClick,
     )
 }
 
 @Composable
 fun SignInScreen(
-    authViewModel: AuthViewModel,
-    signInState: SignInState,
-    navigateToSignUp: () -> Unit,
-    navigateToMain: (String) -> Unit
+    onSignUpClick: () -> Unit,
+    onSignInClick: (String, String) -> Unit
 ) {
-    val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
-    val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(inputEmail,inputPassword) {
-        authViewModel.updateSignInState(authViewModel.isSignInValid(inputEmail,inputPassword))
-    }
 
     Column(
         modifier = Modifier
@@ -138,58 +148,7 @@ fun SignInScreen(
         Spacer(Modifier.height(30.dp))
 
         Button(
-            onClick = {
-                when (signInState) {
-                    is SignInState.EmailEmpty -> {
-                        showToast(context = context, message = "이메일을 입력해주세요")
-                    }
-
-                    is SignInState.PasswordEmpty -> {
-                        showToast(context = context, message = "비밀번호를 입력해주세요")
-                    }
-
-                    is SignInState.EmailInvalid -> {
-                        coroutineScope.launch {
-                            val snackBarResult = snackBarHostState.showSnackbar(
-                                message = "이메일이 일치하지 않습니다",
-                                actionLabel = "실행 취소",
-                                duration = SnackbarDuration.Short
-                            )
-                            when (snackBarResult) {
-                                SnackbarResult.ActionPerformed -> {
-                                    inputEmail = ""
-                                }
-
-                                SnackbarResult.Dismissed -> {}
-                            }
-                        }
-                    }
-
-                    is SignInState.PasswordInvalid -> {
-                        coroutineScope.launch {
-                            val snackBarResult = snackBarHostState.showSnackbar(
-                                message = "비밀번호가 일치하지 않습니다",
-                                actionLabel = "실행 취소",
-                                duration = SnackbarDuration.Short
-                            )
-                            when (snackBarResult) {
-                                SnackbarResult.ActionPerformed -> {
-                                    inputPassword = ""
-                                }
-
-                                SnackbarResult.Dismissed -> {}
-                            }
-                        }
-                    }
-
-                    is SignInState.Success -> {
-                        showToast(context = context, message = "로그인 성공")
-                        navigateToMain(authViewModel.authEmail.value.toString())
-                    }
-
-                    else -> {}
-                }
-            },
+            onClick = { onSignInClick(inputEmail, inputPassword) },
             modifier = Modifier
                 .fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color(0xFF0F42C7))
@@ -204,22 +163,20 @@ fun SignInScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             SignInOption(text = "아이디 찾기")
-            Box(
-                modifier = Modifier
-                    .height(12.dp)
-                    .width(1.dp)
-                    .background(color = Color(0xFF848484))
+            VerticalDivider(
+                modifier = Modifier.height(12.dp),
+                thickness = 1.dp,
+                color = Color(0xFF848484)
             )
             SignInOption(text = "비밀번호 재설정")
-            Box(
-                modifier = Modifier
-                    .height(12.dp)
-                    .width(1.dp)
-                    .background(color = Color(0xFF848484))
+            VerticalDivider(
+                modifier = Modifier.height(12.dp),
+                thickness = 1.dp,
+                color = Color(0xFF848484)
             )
             SignInOption(
                 text = "회원가입",
-                onClick = { navigateToSignUp() }
+                onClick = { onSignUpClick() }
             )
         }
 
@@ -252,16 +209,10 @@ fun SignInScreen(
             )
         }
 
-        Row(
-            modifier = Modifier.padding(vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            PlatformSignInButton(id = R.drawable.img_auth_kakao)
-            PlatformSignInButton(id = R.drawable.img_auth_skt)
-            PlatformSignInButton(id = R.drawable.img_auth_naver)
-            PlatformSignInButton(id = R.drawable.img_auth_facebook)
-            PlatformSignInButton(id = R.drawable.img_auth_apple)
-        }
+        SocialPlatformIconRow(
+            images = SocialPlatformList,
+            onClick = {}
+        )
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -286,8 +237,6 @@ fun SignInScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
-
-        SnackbarHost(hostState = snackBarHostState)
     }
 }
 
@@ -306,21 +255,7 @@ fun SignInOption(
     )
 }
 
-@Composable
-fun PlatformSignInButton(
-    id: Int,
-    onClick: () -> Unit = {}
-) {
-    Image(
-        painter = painterResource(id = id),
-        contentDescription = "",
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(vertical = 10.dp, horizontal = 4.dp)
-            .size(50.dp),
-        contentScale = ContentScale.Crop
-    )
-}
+
 
 @Preview(showBackground = true)
 @Composable

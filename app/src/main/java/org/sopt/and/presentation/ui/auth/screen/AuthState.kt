@@ -8,3 +8,10 @@ sealed class SignInState {
     data object PasswordInvalid : SignInState()
     data object Success : SignInState()
 }
+
+sealed class SignUpState {
+    data object Idle: SignUpState()
+    data object EmailInvalid: SignUpState()
+    data object PasswordInvalid: SignUpState()
+    data object Success: SignUpState()
+}
