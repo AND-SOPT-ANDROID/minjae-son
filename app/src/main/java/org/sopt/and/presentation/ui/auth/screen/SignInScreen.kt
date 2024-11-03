@@ -92,8 +92,6 @@ fun SignInScreen(
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
 
-    val a = 3.toString()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
