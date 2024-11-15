@@ -1,17 +1,17 @@
 package org.sopt.and.presentation.ui.auth.screen
 
+import org.sopt.and.data.remote.dto.response.ResponseUserRegistrationDto
+
 sealed class SignInState {
     data object Idle : SignInState()
     data object EmailEmpty : SignInState()
     data object PasswordEmpty : SignInState()
-    data object EmailInvalid : SignInState()
-    data object PasswordInvalid : SignInState()
     data object Success : SignInState()
+    data class Failure(val errorMessage: String) : SignInState()
 }
 
 sealed class SignUpState {
-    data object Idle: SignUpState()
-    data object EmailInvalid: SignUpState()
-    data object PasswordInvalid: SignUpState()
-    data object Success: SignUpState()
+    data object Idle : SignUpState()
+    data class Success(val response: ResponseUserRegistrationDto?) : SignUpState()
+    data class Failure(val errorMessage: String) : SignUpState()
 }
