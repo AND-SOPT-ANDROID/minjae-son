@@ -1,4 +1,4 @@
-package org.sopt.and.presentation.utils
+package org.sopt.and.presentation.util
 
 import android.content.Context
 import android.widget.Toast
