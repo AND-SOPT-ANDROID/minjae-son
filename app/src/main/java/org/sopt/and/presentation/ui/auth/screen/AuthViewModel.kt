@@ -1,39 +1,87 @@
 package org.sopt.and.presentation.ui.auth.screen
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import org.sopt.and.presentation.model.User
-import org.sopt.and.presentation.model.validateSignUp
+import kotlinx.coroutines.launch
+import org.sopt.and.data.remote.dto.request.RequestLoginDto
+import org.sopt.and.data.remote.dto.request.RequestUserRegistrationDto
+import org.sopt.and.data.remote.dto.response.ResponseLoginDto
+import org.sopt.and.data.remote.dto.response.ResponseUserRegistrationDto
+import org.sopt.and.data.repository.TokenRepository
+import org.sopt.and.di.ServicePool
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor() : ViewModel() {
-    private val _user = MutableLiveData<User>()
-    val user: LiveData<User> = _user
+class AuthViewModel @Inject constructor(
+    private val tokenRepository: TokenRepository,
+) : ViewModel() {
+    private val authService by lazy { ServicePool.authService }
 
     private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
-    val signInState : StateFlow<SignInState> = _signInState
+    val signInState: StateFlow<SignInState> = _signInState
 
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
-    val signUpState : StateFlow<SignUpState> = _signUpState
+    val signUpState: StateFlow<SignUpState> = _signUpState
 
     fun validateSignIn(inputEmail: String, inputPassword: String) {
-        _signInState.value = when {
-            inputEmail.isEmpty() -> SignInState.EmailEmpty
-            inputPassword.isEmpty() -> SignInState.PasswordEmpty
-            _user.value?.email != inputEmail -> SignInState.EmailInvalid
-            _user.value?.password != inputPassword -> SignInState.PasswordInvalid
-            else -> SignInState.Success
+        viewModelScope.launch {
+            authService.login(RequestLoginDto(inputEmail, inputPassword)).enqueue(object :
+                Callback<ResponseLoginDto> {
+                override fun onResponse(
+                    call: Call<ResponseLoginDto>,
+                    response: Response<ResponseLoginDto>
+                ) {
+                    if (response.isSuccessful) {
+                        _signInState.value = SignInState.Success
+                        tokenRepository.setToken(token = response.body()?.result!!.token)
+                        Log.d("token", tokenRepository.getToken())
+                    } else {
+                        _signInState.value = SignInState.Failure(response.message())
+                    }
+                }
+
+                override fun onFailure(
+                    call: Call<ResponseLoginDto>,
+                    t: Throwable
+                ) {
+                    _signInState.value = SignInState.Failure(t.message.toString())
+                }
+            }
+            )
         }
     }
 
-    fun validateSignUp(email: String, password: String) {
-        val authInfo = User(email, password)
-        _signUpState.value = authInfo.validateSignUp()
-        if (_signUpState.value is SignUpState.Success) _user.value = authInfo
+    fun validateSignUp(email: String, password: String, hobby: String) {
+        viewModelScope.launch {
+            authService.registerUser(RequestUserRegistrationDto(email, password, hobby))
+                .enqueue(object :
+                    Callback<ResponseUserRegistrationDto> {
+                    override fun onResponse(
+                        call: Call<ResponseUserRegistrationDto>,
+                        response: Response<ResponseUserRegistrationDto>
+                    ) {
+                        if (response.isSuccessful) {
+                            _signUpState.value = SignUpState.Success(response.body())
+                        } else {
+                            _signUpState.value = SignUpState.Failure(response.message())
+                        }
+                    }
+
+                    override fun onFailure(
+                        call: Call<ResponseUserRegistrationDto>,
+                        t: Throwable
+                    ) {
+                        _signUpState.value = SignUpState.Failure(t.message.toString())
+                    }
+                }
+                )
+        }
     }
 }
