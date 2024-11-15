@@ -18,7 +18,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,42 +35,33 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
-import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
-import org.sopt.and.presentation.ui.auth.navigation.navigateToSignUp
-import org.sopt.and.presentation.ui.main.navigation.navigateToMain
-import org.sopt.and.presentation.utils.showToast
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.util.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
 fun SignInRoute(
-    navController: NavHostController,
-    authViewModel: AuthViewModel,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    navigateToSignUp: () -> Unit,
+    navigateToMain: () -> Unit,
 ) {
     val context = LocalContext.current
     val signInState by authViewModel.signInState.collectAsState()
 
-    val onSignUpClick = { navController.navigateToSignUp() }
     val onSignInClick: (String, String) -> Unit = { email, password ->
         authViewModel.validateSignIn(email, password)
-    }
-
-    LaunchedEffect(signInState) {
         when (signInState) {
-            is SignInState.EmailEmpty -> showToast(context = context, message = "이메일을 입력하세요")
-            is SignInState.PasswordEmpty -> showToast(context = context, message = "비밀번호를 입력하세요")
-            is SignInState.EmailInvalid -> showToast(context = context, message = "이메일이 일치하지 않습니다")
-            is SignInState.PasswordInvalid -> showToast(
-                context = context,
-                message = "비밀번호가 일치하지 않습니다"
-            )
-
             is SignInState.Success -> {
-                showToast(context = context, message = "로그인에 성공했습니다")
-                navController.navigateToMain(authViewModel.user.value?.email.orEmpty())
+                showToast(context = context, message = "로그인에 성공했습니다.")
+                navigateToMain()
+            }
+
+            is SignInState.Failure -> {
+                showToast(context = context, message = "로그인에 실패했습니다.")
             }
 
             else -> {}
@@ -79,7 +69,7 @@ fun SignInRoute(
     }
 
     SignInScreen(
-        onSignUpClick = onSignUpClick,
+        onSignUpClick = navigateToSignUp,
         onSignInClick = onSignInClick,
     )
 }
@@ -176,7 +166,7 @@ fun SignInScreen(
             )
             SignInOption(
                 text = "회원가입",
-                onClick = { onSignUpClick() }
+                onClick = onSignUpClick
             )
         }
 
@@ -254,8 +244,6 @@ fun SignInOption(
         color = Color(0xFF848484)
     )
 }
-
-
 
 @Preview(showBackground = true)
 @Composable
