@@ -9,7 +9,7 @@ plugins {
     id("kotlin-kapt") // kapt 플러그인 추가
 }
 
-val properties = Properties().apply {
+val localProperties = Properties().apply {
     load(project.rootProject.file("local.properties").inputStream())
 }
 
@@ -24,7 +24,7 @@ android {
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "BASE_URL", properties["base.url"].toString())
+        buildConfigField("String","BASE_URL", localProperties["base.url"].toString())
     }
 
     buildTypes {
