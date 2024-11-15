@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,15 +27,11 @@ import androidx.compose.ui.unit.sp
 import org.sopt.and.R
 
 @Composable
-fun MyPageScreen(
-    paddingValues: PaddingValues,
-    userEmail: String
-) {
+fun MyPageScreen(userHobby: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(color = Color(0xFF161616))
-            .padding(paddingValues)
     ) {
         Row(
             modifier = Modifier
@@ -55,7 +50,7 @@ fun MyPageScreen(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = "${userEmail}님",
+                text = "${userHobby}님",
                 color = Color.White
             )
             Spacer(modifier = Modifier.weight(1f))

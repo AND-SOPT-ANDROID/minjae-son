@@ -2,30 +2,36 @@ package org.sopt.and.presentation.ui.main.navigation
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
+import androidx.navigation.navigation
+import org.sopt.and.presentation.ui.main.screen.HomeScreen
 import org.sopt.and.presentation.ui.main.screen.MainRoute
-import org.sopt.and.presentation.ui.main.screen.MainViewModel
-import org.sopt.and.presentation.ui.navigation.KeyStorage
+import org.sopt.and.presentation.ui.main.screen.MyPageScreen
+import org.sopt.and.presentation.ui.main.screen.SearchScreen
 import org.sopt.and.presentation.ui.navigation.WavveRoute
 
 fun NavGraphBuilder.mainNavGraph(
     navController: NavHostController,
-    mainViewModel: MainViewModel,
 ) {
-    composable(
-        route = "${WavveRoute.MAIN}/{${KeyStorage.USER_EMAIL}}",
-        arguments = listOf(
-            navArgument(KeyStorage.USER_EMAIL) { type = NavType.StringType }
-        )
-    ) { navBackStackEntry ->
-        val userEmail =
-            navBackStackEntry.arguments?.getString(KeyStorage.USER_EMAIL) ?: "unknown@example.com"
-        MainRoute(
-            navController = navController,
-            mainViewModel = mainViewModel,
-            userEmail = userEmail,
-        )
+    navigation(
+        startDestination = WavveRoute.MAIN,
+        route = WavveRoute.WAVVE
+    ) {
+        composable(route = WavveRoute.MAIN) {
+            MainRoute(
+                navigateToHome = { navController.navigateToHome() },
+                navigateToSearch = { navController.navigateToSearch() },
+                navigateToMy = { navController.navigateToMy() }
+            )
+        }
+        composable(route = WavveRoute.HOME) {
+            HomeScreen()
+        }
+        composable(route = WavveRoute.SEARCH) {
+            SearchScreen()
+        }
+        composable(route = WavveRoute.MY) {
+            MyPageScreen(userHobby = "")
+        }
     }
 }

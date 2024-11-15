@@ -4,7 +4,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,14 +42,11 @@ import org.sopt.and.presentation.ui.main.component.todayTop20Images
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
-fun HomeScreen(
-    paddingValues: PaddingValues
-) {
+fun HomeScreen() {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF161616))
-            .padding(paddingValues)
             .padding(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -194,8 +190,6 @@ fun HomeHorizontalBanner(
 @Composable
 fun ShowHomeScreen() {
     ANDANDROIDTheme {
-        HomeScreen(
-            paddingValues = PaddingValues(0.dp)
-        )
+
     }
 }

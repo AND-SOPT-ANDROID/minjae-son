@@ -1,8 +1,10 @@
 package org.sopt.and.presentation.ui.main.screen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.NavigationBar
@@ -11,6 +13,8 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,24 +28,31 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
 fun MainRoute(
-    navController: NavHostController,
-    mainViewModel: MainViewModel,
-    userEmail: String,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    navigateToHome: () -> Unit,
+    navigateToSearch: () -> Unit,
+    navigateToMy: () -> Unit,
 ) {
+    val userHobbyState by mainViewModel.userHobbyState.collectAsState()
+
+    LaunchedEffect(Unit) {
+        mainViewModel.getUserHobby()
+    }
+
     MainScreen(
-        userEmail = userEmail
+        userHobbyState = userHobbyState,
     )
 }
 
 @Composable
 fun MainScreen(
-    userEmail: String
+    userHobbyState: UserHobbyState,
 ) {
     var selectedTab by remember { mutableStateOf<MainTabList>(MainTabList.HOME) }
     val onTabSelected: (MainTabList) -> Unit = { tab ->
@@ -127,23 +138,39 @@ fun MainScreen(
         containerColor = Color.Black,
         contentWindowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
         content = { innerPadding ->
-            // selectedTab 값에 따라 표시되는 화면을 변경
-            when (selectedTab) {
-                MainTabList.HOME -> HomeScreen(innerPadding)
-                MainTabList.SEARCH -> SearchScreen(innerPadding)
-                MainTabList.MY -> MyPageScreen(
-                    paddingValues = innerPadding,
-                    userEmail = userEmail
-                )
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) {
+                when (selectedTab) {
+                    MainTabList.HOME -> HomeScreen()
+                    MainTabList.SEARCH -> SearchScreen()
+                    MainTabList.MY -> {
+                        when (userHobbyState) {
+                            is UserHobbyState.Success -> {
+                                val userHobby = userHobbyState.hobby
+                                MyPageScreen(userHobby = userHobby)
+                            }
+
+                            is UserHobbyState.Failure -> {
+                                val errorMessage = userHobbyState.errorMessage
+                            }
+
+                            else -> {}
+                        }
+                    }
+                }
             }
+
         }
     )
 }
 
 sealed class MainTabList {
-    data object HOME: MainTabList()
-    data object SEARCH: MainTabList()
-    data object MY: MainTabList()
+    data object HOME : MainTabList()
+    data object SEARCH : MainTabList()
+    data object MY : MainTabList()
 }
 
 
