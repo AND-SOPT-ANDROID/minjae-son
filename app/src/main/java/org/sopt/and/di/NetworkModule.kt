@@ -18,16 +18,6 @@ import javax.inject.Singleton
 object NetworkModule {
     @Provides
     @Singleton
-    fun providesJson(): Json =
-        Json {
-            isLenient = true
-            prettyPrint = true
-            explicitNulls = false
-            ignoreUnknownKeys = true
-        }
-
-    @Provides
-    @Singleton
     fun provideLoggingInterceptor(): HttpLoggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
@@ -40,6 +30,16 @@ object NetworkModule {
         OkHttpClient.Builder().apply {
             addInterceptor(loggingInterceptor)
         }.build()
+
+    @Provides
+    @Singleton
+    fun providesJson(): Json =
+        Json {
+            isLenient = true
+            prettyPrint = true
+            explicitNulls = false
+            ignoreUnknownKeys = true
+        }
 
     @Provides
     @Singleton

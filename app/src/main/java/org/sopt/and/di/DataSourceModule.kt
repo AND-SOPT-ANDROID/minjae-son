@@ -19,9 +19,9 @@ import javax.inject.Singleton
 abstract class DataSourceModule {
     @Binds
     @Singleton
-    fun bindTokenLocalDataSource(sharedPreferences: SharedPreferences): TokenLocalDataSource {
-        return TokenLocalDataSourceImpl(sharedPreferences)
-    }
+    abstract fun bindTokenLocalDataSource(
+        tokenLocalDataSourceImpl: TokenLocalDataSourceImpl
+    ): TokenLocalDataSource
 
     @Binds
     @Singleton
