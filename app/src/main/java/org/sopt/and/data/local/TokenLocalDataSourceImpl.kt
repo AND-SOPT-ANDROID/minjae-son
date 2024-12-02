@@ -10,8 +10,8 @@ class TokenLocalDataSourceImpl @Inject constructor(
         get() = sharedPreferences.getString(TOKEN, "") ?: ""
         set(value) = sharedPreferences.edit().putString(TOKEN, value).apply()
 
-    override fun clearInfo() {
-        sharedPreferences.edit().clear().apply()
+    override fun removeToken() {
+        sharedPreferences.edit().remove(TOKEN).apply()
     }
 
     companion object {

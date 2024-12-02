@@ -80,7 +80,6 @@ fun SignUpScreen(
     onSignUpClick: (String, String, String) -> Unit,
     onCancelClick: () -> Unit,
 ) {
-
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
     var inputHobby by remember { mutableStateOf("") }
