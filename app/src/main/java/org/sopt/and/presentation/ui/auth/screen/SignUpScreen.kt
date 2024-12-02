@@ -47,39 +47,24 @@ fun SignUpRoute(
     navigateToSignIn: () -> Unit,
     navigateToBack: () -> Unit,
 ) {
-    val context = LocalContext.current
     val signUpState by authViewModel.signUpState.collectAsState()
 
-    val onSignUpClick: (String, String, String) -> Unit = { username, password, hobby ->
-        authViewModel.validateSignUp(username, password, hobby)
-        when (signUpState) {
-            is SignUpState.Success -> {
-                showToast(
-                    context = context,
-                    message = "회원가입에 성공했습니다. 회원번호는 ${(signUpState as SignUpState.Success).response?.result?.no}입니다."
-                )
-                navigateToSignIn()
-            }
-
-            is SignUpState.Failure -> {
-                showToast(context = context, message = "회원가입에 실패하였습니다.")
-            }
-
-            else -> {}
-        }
-    }
-
     SignUpScreen(
-        onSignUpClick = onSignUpClick,
+        signUpState = signUpState,
+        onSignUpClick = { username, password, hobby -> authViewModel.validateSignUp(username, password, hobby)},
+        navigateToSignIn = navigateToSignIn,
         onCancelClick = navigateToBack,
     )
 }
 
 @Composable
 fun SignUpScreen(
+    signUpState: SignUpState,
     onSignUpClick: (String, String, String) -> Unit,
+    navigateToSignIn: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
+    val context = LocalContext.current
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
     var inputHobby by remember { mutableStateOf("") }
@@ -307,9 +292,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = Color(0xFF0F42C7))
-                .clickable(
-                    onClick = { onSignUpClick(inputEmail, inputPassword, inputHobby) }
-                ),
+                .clickable(onClick = { onSignUpClick(inputEmail, inputPassword, inputHobby) }),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -317,6 +300,23 @@ fun SignUpScreen(
                 modifier = Modifier.padding(10.dp),
                 color = Color.White
             )
+        }
+
+        when(signUpState) {
+            is SignUpState.Success -> {
+                showToast(
+                    context = context,
+                    message = "회원가입에 성공했습니다. 유저번호는 ${signUpState.result.no}입니다."
+                )
+                navigateToSignIn()
+            }
+            is SignUpState.Failure -> {
+                showToast(
+                    context = context,
+                    message = "회원가입에 실패했습니다. 형식을 다시 확인해주세요."
+                )
+            }
+            else -> {}
         }
     }
 }

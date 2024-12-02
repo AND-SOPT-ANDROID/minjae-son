@@ -49,36 +49,24 @@ fun SignInRoute(
     navigateToSignUp: () -> Unit,
     navigateToMain: () -> Unit,
 ) {
-    val context = LocalContext.current
     val signInState by authViewModel.signInState.collectAsState()
 
-    val onSignInClick: (String, String) -> Unit = { email, password ->
-        authViewModel.validateSignIn(email, password)
-        when (signInState) {
-            is SignInState.Success -> {
-                showToast(context = context, message = "로그인에 성공했습니다.")
-                navigateToMain()
-            }
-
-            is SignInState.Failure -> {
-                showToast(context = context, message = "로그인에 실패했습니다.")
-            }
-
-            else -> {}
-        }
-    }
-
     SignInScreen(
+        signInState = signInState,
         onSignUpClick = navigateToSignUp,
-        onSignInClick = onSignInClick,
+        onSignInClick = { email, password -> authViewModel.validateSignIn(email, password) },
+        navigateToMain = navigateToMain
     )
 }
 
 @Composable
 fun SignInScreen(
+    signInState: SignInState,
     onSignUpClick: () -> Unit,
-    onSignInClick: (String, String) -> Unit
+    onSignInClick: (String, String) -> Unit,
+    navigateToMain: () -> Unit,
 ) {
+    val context = LocalContext.current
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
 
@@ -139,8 +127,7 @@ fun SignInScreen(
 
         Button(
             onClick = { onSignInClick(inputEmail, inputPassword) },
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color(0xFF0F42C7))
         ) {
             Text(
@@ -227,6 +214,23 @@ fun SignInScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        when(signInState) {
+            is SignInState.Success -> {
+                showToast(
+                    context = context,
+                    message = "로그인에 성공했습니다."
+                )
+                navigateToMain()
+            }
+            is SignInState.Failure -> {
+                showToast(
+                    context = context,
+                    message = "아이디와 비밃번호를 다시 확인해주세요."
+                )
+            }
+            else -> {}
+        }
     }
 }
 

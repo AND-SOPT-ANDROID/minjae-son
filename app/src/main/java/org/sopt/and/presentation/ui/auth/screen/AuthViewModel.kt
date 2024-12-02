@@ -1,106 +1,64 @@
 package org.sopt.and.presentation.ui.auth.screen
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.sopt.and.data.remote.model.request.LoginRequestDto
-import org.sopt.and.data.remote.model.request.UserRegistrationRequestDto
-import org.sopt.and.data.remote.model.response.LoginResponseDto
-import org.sopt.and.data.remote.model.response.UserRegistrationResponseDto
+import org.sopt.and.domain.model.User
+import org.sopt.and.domain.repository.AuthRepository
 import org.sopt.and.domain.repository.TokenRepository
-import org.sopt.and.di.ServicePool
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
-    private val authService by lazy { ServicePool.authService }
-
     private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
     val signInState: StateFlow<SignInState> = _signInState
 
-    private val _signInUserName = MutableLiveData("")
-    val signInUserName: LiveData<String> = _signInUserName
-
-    private val _signInPassword = MutableLiveData("")
-    val signInPassword: LiveData<String> = _signInPassword
+    private val _token = MutableStateFlow("")
+    val token: StateFlow<String> = _token
 
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
     val signUpState: StateFlow<SignUpState> = _signUpState
 
-    private val _signUpUserName = MutableLiveData("")
-    val signUpUserName: LiveData<String> = _signUpUserName
-
-    private val _signUpPassword = MutableLiveData("")
-    val signUpPassword: LiveData<String> = _signUpPassword
-
-    private val _signUpHobby = MutableLiveData("")
-    val signUpHobby: LiveData<String> = _signUpHobby
-
-
-
-    fun validateSignIn(inputEmail: String, inputPassword: String) {
+    fun validateSignIn(username: String, password: String) {
+        _signInState.value = SignInState.Loading
         viewModelScope.launch {
-            authService.login(LoginRequestDto(inputEmail, inputPassword)).enqueue(object :
-                Callback<LoginResponseDto> {
-                override fun onResponse(
-                    call: Call<LoginResponseDto>,
-                    response: Response<LoginResponseDto>
-                ) {
-                    if (response.isSuccessful) {
-                        _signInState.value = SignInState.Success
-                        tokenRepository.setToken(token = response.body()!!.token)
-                        Log.d("token", tokenRepository.getToken())
-                    } else {
-                        _signInState.value = SignInState.Failure(response.message())
-                    }
+            val result = authRepository.login(username = username, password = password)
+            _signInState.value = result.fold(
+                onSuccess = { token ->
+                    tokenRepository.setToken(token.token)
+                    Log.d("token","토큰 저장 완료! 저장값은 ${token.token} 입니다.")
+                    SignInState.Success(token)
+                },
+                onFailure = {
+                    SignInState.Failure(it.localizedMessage ?: "에러 발생")
                 }
-
-                override fun onFailure(
-                    call: Call<LoginResponseDto>,
-                    t: Throwable
-                ) {
-                    _signInState.value = SignInState.Failure(t.message.toString())
-                }
-            }
             )
         }
     }
 
-    fun validateSignUp(email: String, password: String, hobby: String) {
+    fun validateSignUp(username: String, password: String, hobby: String) {
+        _signUpState.value = SignUpState.Loading
         viewModelScope.launch {
-            authService.registerUser(UserRegistrationRequestDto(email, password, hobby))
-                .enqueue(object :
-                    Callback<UserRegistrationResponseDto> {
-                    override fun onResponse(
-                        call: Call<UserRegistrationResponseDto>,
-                        response: Response<UserRegistrationResponseDto>
-                    ) {
-                        if (response.isSuccessful) {
-                            _signUpState.value = SignUpState.Success(response.body())
-                        } else {
-                            _signUpState.value = SignUpState.Failure(response.message())
-                        }
-                    }
-
-                    override fun onFailure(
-                        call: Call<UserRegistrationResponseDto>,
-                        t: Throwable
-                    ) {
-                        _signUpState.value = SignUpState.Failure(t.message.toString())
-                    }
+            val result = authRepository.registerUser(user = User(
+                username = username,
+                password = password,
+                hobby = hobby
+            ))
+            _signUpState.value = result.fold(
+                onSuccess = {
+                    SignUpState.Success(it)
+                },
+                onFailure = {
+                    SignUpState.Failure(it.localizedMessage ?: "에러 발생")
                 }
-                )
+            )
         }
     }
 }
