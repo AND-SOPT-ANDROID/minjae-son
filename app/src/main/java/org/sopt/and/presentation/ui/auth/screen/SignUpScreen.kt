@@ -33,60 +33,56 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.auth.component.AuthTextField
-import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
-import org.sopt.and.presentation.ui.auth.navigation.navigateToSignIn
-import org.sopt.and.presentation.utils.showToast
+import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.util.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
 fun SignUpRoute(
-    authViewModel: AuthViewModel,
-    navController: NavHostController,
+    authViewModel: AuthViewModel = hiltViewModel(),
+    navigateToSignIn: () -> Unit,
+    navigateToBack: () -> Unit,
 ) {
     val context = LocalContext.current
     val signUpState by authViewModel.signUpState.collectAsState()
 
-    val onSignUpClick: (String, String) -> Unit = { email, password ->
-        authViewModel.validateSignUp(email, password)
+    val onSignUpClick: (String, String, String) -> Unit = { username, password, hobby ->
+        authViewModel.validateSignUp(username, password, hobby)
         when (signUpState) {
-            is SignUpState.EmailInvalid -> showToast(
-                context = context,
-                message = "아이디가 잘못된 형식입니다"
-            )
-
-            is SignUpState.PasswordInvalid -> showToast(
-                context = context,
-                message = "비밀번호가 잘못된 형식입니다"
-            )
-
             is SignUpState.Success -> {
-                showToast(context = context, message = "회원가입에 성공했습니다.")
-                navController.navigateToSignIn()
+                showToast(
+                    context = context,
+                    message = "회원가입에 성공했습니다. 회원번호는 ${(signUpState as SignUpState.Success).response?.result?.no}입니다."
+                )
+                navigateToSignIn()
+            }
+
+            is SignUpState.Failure -> {
+                showToast(context = context, message = "회원가입에 실패하였습니다.")
             }
 
             else -> {}
         }
     }
-    val onCancelClick: () -> Unit = { navController.popBackStack() }
 
     SignUpScreen(
         onSignUpClick = onSignUpClick,
-        onCancelClick = onCancelClick,
+        onCancelClick = navigateToBack,
     )
 }
 
 @Composable
 fun SignUpScreen(
-    onSignUpClick: (String, String) -> Unit,
+    onSignUpClick: (String, String, String) -> Unit,
     onCancelClick: () -> Unit,
 ) {
-
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
+    var inputHobby by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -157,7 +153,7 @@ fun SignUpScreen(
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
                     .background(color = Color(0xFF262626)),
-                hint = "wavve@example.com"
+                hint = "sonny"
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -207,6 +203,36 @@ fun SignUpScreen(
                 )
                 Text(
                     text = "비밀번호는 8~20자 이내로 영문 대소문자, 숫자, 특수문자 중 3가지 이상 혼용하여 입력해주세요.",
+                    fontSize = 12.sp,
+                    lineHeight = 14.sp,
+                    color = Color(0xFF848484)
+                )
+            }
+
+            AuthTextField(
+                value = inputHobby,
+                onValueChange = { newValue -> inputHobby = newValue },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(shape = RoundedCornerShape(4.dp))
+                    .background(color = Color(0xFF262626)),
+                hint = "basket"
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.img_signup_caution),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .align(Alignment.Top)
+                        .padding(2.dp)
+                        .size(14.dp)
+                )
+                Text(
+                    text = "8자 미만으로 작성해주세요.",
                     fontSize = 12.sp,
                     lineHeight = 14.sp,
                     color = Color(0xFF848484)
@@ -282,7 +308,7 @@ fun SignUpScreen(
                 .fillMaxWidth()
                 .background(color = Color(0xFF0F42C7))
                 .clickable(
-                    onClick = { onSignUpClick(inputEmail, inputPassword) }
+                    onClick = { onSignUpClick(inputEmail, inputPassword, inputHobby) }
                 ),
             contentAlignment = Alignment.Center
         ) {

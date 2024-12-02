@@ -4,15 +4,13 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import kotlinx.serialization.Serializable
-import org.sopt.and.presentation.ui.auth.screen.AuthViewModel
 import org.sopt.and.presentation.ui.auth.screen.SignInRoute
 import org.sopt.and.presentation.ui.auth.screen.SignUpRoute
+import org.sopt.and.presentation.ui.main.navigation.navigateToMain
 import org.sopt.and.presentation.ui.navigation.WavveRoute
 
 fun NavGraphBuilder.authNavGraph(
     navController: NavHostController,
-    authViewModel: AuthViewModel,
 ) {
     navigation(
         startDestination = WavveRoute.SIGN_IN,
@@ -20,15 +18,15 @@ fun NavGraphBuilder.authNavGraph(
     ) {
         composable(route = WavveRoute.SIGN_IN) {
             SignInRoute(
-                navController = navController,
-                authViewModel = authViewModel,
+                navigateToSignUp = { navController.navigateToSignUp() },
+                navigateToMain = { navController.navigateToMain() },
             )
         }
 
         composable(route = WavveRoute.SIGN_UP) {
             SignUpRoute(
-                navController = navController,
-                authViewModel = authViewModel,
+                navigateToSignIn = { navController.navigateToSignIn() },
+                navigateToBack = { navController.popBackStack() }
             )
         }
     }

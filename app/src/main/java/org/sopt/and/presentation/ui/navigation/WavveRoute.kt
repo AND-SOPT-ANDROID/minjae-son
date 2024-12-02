@@ -7,5 +7,9 @@ object WavveRoute {
     const val SIGN_UP = "sign_up"
 
     // mainNavGraph
+    const val WAVVE = "wavve"
     const val MAIN = "main"
+    const val HOME = "home"
+    const val SEARCH = "search"
+    const val MY = "my"
 }
