@@ -9,10 +9,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.sopt.and.data.remote.model.request.RequestLoginDto
-import org.sopt.and.data.remote.model.request.RequestUserRegistrationDto
-import org.sopt.and.data.remote.model.response.ResponseLoginDto
-import org.sopt.and.data.remote.model.response.ResponseUserRegistrationDto
+import org.sopt.and.data.remote.model.request.LoginRequestDto
+import org.sopt.and.data.remote.model.request.UserRegistrationRequestDto
+import org.sopt.and.data.remote.model.response.LoginResponseDto
+import org.sopt.and.data.remote.model.response.UserRegistrationResponseDto
 import org.sopt.and.domain.repository.TokenRepository
 import org.sopt.and.di.ServicePool
 import retrofit2.Call
@@ -51,15 +51,15 @@ class AuthViewModel @Inject constructor(
 
     fun validateSignIn(inputEmail: String, inputPassword: String) {
         viewModelScope.launch {
-            authService.login(RequestLoginDto(inputEmail, inputPassword)).enqueue(object :
-                Callback<ResponseLoginDto> {
+            authService.login(LoginRequestDto(inputEmail, inputPassword)).enqueue(object :
+                Callback<LoginResponseDto> {
                 override fun onResponse(
-                    call: Call<ResponseLoginDto>,
-                    response: Response<ResponseLoginDto>
+                    call: Call<LoginResponseDto>,
+                    response: Response<LoginResponseDto>
                 ) {
                     if (response.isSuccessful) {
                         _signInState.value = SignInState.Success
-                        tokenRepository.setToken(token = response.body()?.result!!.token)
+                        tokenRepository.setToken(token = response.body()!!.token)
                         Log.d("token", tokenRepository.getToken())
                     } else {
                         _signInState.value = SignInState.Failure(response.message())
@@ -67,7 +67,7 @@ class AuthViewModel @Inject constructor(
                 }
 
                 override fun onFailure(
-                    call: Call<ResponseLoginDto>,
+                    call: Call<LoginResponseDto>,
                     t: Throwable
                 ) {
                     _signInState.value = SignInState.Failure(t.message.toString())
@@ -79,12 +79,12 @@ class AuthViewModel @Inject constructor(
 
     fun validateSignUp(email: String, password: String, hobby: String) {
         viewModelScope.launch {
-            authService.registerUser(RequestUserRegistrationDto(email, password, hobby))
+            authService.registerUser(UserRegistrationRequestDto(email, password, hobby))
                 .enqueue(object :
-                    Callback<ResponseUserRegistrationDto> {
+                    Callback<UserRegistrationResponseDto> {
                     override fun onResponse(
-                        call: Call<ResponseUserRegistrationDto>,
-                        response: Response<ResponseUserRegistrationDto>
+                        call: Call<UserRegistrationResponseDto>,
+                        response: Response<UserRegistrationResponseDto>
                     ) {
                         if (response.isSuccessful) {
                             _signUpState.value = SignUpState.Success(response.body())
@@ -94,7 +94,7 @@ class AuthViewModel @Inject constructor(
                     }
 
                     override fun onFailure(
-                        call: Call<ResponseUserRegistrationDto>,
+                        call: Call<UserRegistrationResponseDto>,
                         t: Throwable
                     ) {
                         _signUpState.value = SignUpState.Failure(t.message.toString())

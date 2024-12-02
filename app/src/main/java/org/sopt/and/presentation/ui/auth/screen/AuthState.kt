@@ -1,6 +1,6 @@
 package org.sopt.and.presentation.ui.auth.screen
 
-import org.sopt.and.data.remote.model.response.ResponseUserRegistrationDto
+import org.sopt.and.data.remote.model.response.UserRegistrationResponseDto
 
 sealed class SignInState {
     data object Idle : SignInState()
@@ -12,6 +12,6 @@ sealed class SignInState {
 
 sealed class SignUpState {
     data object Idle : SignUpState()
-    data class Success(val response: ResponseUserRegistrationDto?) : SignUpState()
+    data class Success(val response: UserRegistrationResponseDto?) : SignUpState()
     data class Failure(val errorMessage: String) : SignUpState()
 }

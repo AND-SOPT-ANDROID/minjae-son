@@ -1,9 +1,9 @@
 package org.sopt.and.data.remote.service
 
-import org.sopt.and.data.remote.model.request.RequestLoginDto
-import org.sopt.and.data.remote.model.request.RequestUserRegistrationDto
-import org.sopt.and.data.remote.model.response.ResponseLoginDto
-import org.sopt.and.data.remote.model.response.ResponseUserRegistrationDto
+import org.sopt.and.data.remote.model.request.LoginRequestDto
+import org.sopt.and.data.remote.model.request.UserRegistrationRequestDto
+import org.sopt.and.data.remote.model.response.LoginResponseDto
+import org.sopt.and.data.remote.model.response.UserRegistrationResponseDto
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -11,11 +11,11 @@ import retrofit2.http.POST
 interface AuthService {
     @POST("user")
     fun registerUser(
-        @Body requestUserRegistrationDto: RequestUserRegistrationDto
-    ): Call<ResponseUserRegistrationDto>
+        @Body userRegistrationRequestDto: UserRegistrationRequestDto
+    ): Call<UserRegistrationResponseDto>
 
     @POST("login")
     fun login(
-        @Body requestLoginDto: RequestLoginDto
-    ): Call<ResponseLoginDto>
+        @Body loginRequestDto: LoginRequestDto
+    ): Call<LoginResponseDto>
 }
