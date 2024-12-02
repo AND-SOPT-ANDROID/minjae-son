@@ -15,7 +15,7 @@ class TokenRepositoryImpl @Inject constructor(
         Log.d("TokenDataStore", "Token Saved: $token")
     }
 
-    override fun clearInfo() {
-        tokenLocalDataSource.clearInfo()
+    override fun removeToken() {
+        tokenLocalDataSource.removeToken()
     }
 }
