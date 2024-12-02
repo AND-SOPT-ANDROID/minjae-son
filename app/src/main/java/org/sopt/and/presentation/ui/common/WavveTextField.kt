@@ -1,4 +1,4 @@
-package org.sopt.and.presentation.ui.auth.component
+package org.sopt.and.presentation.ui.common
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun AuthTextField(
+fun WavveTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
