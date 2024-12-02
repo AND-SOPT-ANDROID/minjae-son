@@ -1,17 +1,19 @@
 package org.sopt.and.presentation.ui.auth.screen
 
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.sopt.and.data.remote.dto.request.RequestLoginDto
-import org.sopt.and.data.remote.dto.request.RequestUserRegistrationDto
-import org.sopt.and.data.remote.dto.response.ResponseLoginDto
-import org.sopt.and.data.remote.dto.response.ResponseUserRegistrationDto
-import org.sopt.and.data.repository.TokenRepository
+import org.sopt.and.data.remote.model.request.RequestLoginDto
+import org.sopt.and.data.remote.model.request.RequestUserRegistrationDto
+import org.sopt.and.data.remote.model.response.ResponseLoginDto
+import org.sopt.and.data.remote.model.response.ResponseUserRegistrationDto
+import org.sopt.and.domain.repository.TokenRepository
 import org.sopt.and.di.ServicePool
 import retrofit2.Call
 import retrofit2.Callback
@@ -27,8 +29,25 @@ class AuthViewModel @Inject constructor(
     private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle)
     val signInState: StateFlow<SignInState> = _signInState
 
+    private val _signInUserName = MutableLiveData("")
+    val signInUserName: LiveData<String> = _signInUserName
+
+    private val _signInPassword = MutableLiveData("")
+    val signInPassword: LiveData<String> = _signInPassword
+
     private val _signUpState = MutableStateFlow<SignUpState>(SignUpState.Idle)
     val signUpState: StateFlow<SignUpState> = _signUpState
+
+    private val _signUpUserName = MutableLiveData("")
+    val signUpUserName: LiveData<String> = _signUpUserName
+
+    private val _signUpPassword = MutableLiveData("")
+    val signUpPassword: LiveData<String> = _signUpPassword
+
+    private val _signUpHobby = MutableLiveData("")
+    val signUpHobby: LiveData<String> = _signUpHobby
+
+
 
     fun validateSignIn(inputEmail: String, inputPassword: String) {
         viewModelScope.launch {

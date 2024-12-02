@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.sopt.and.data.local.TokenLocalDataSource
-import org.sopt.and.data.remote.dto.response.ResponseGetMyHobbyDto
+import org.sopt.and.data.remote.model.response.ResponseGetMyHobbyDto
 import org.sopt.and.di.ServicePool
 import retrofit2.Call
 import retrofit2.Callback

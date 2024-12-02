@@ -1,6 +1,6 @@
 package org.sopt.and.presentation.ui.auth.screen
 
-import org.sopt.and.data.remote.dto.response.ResponseUserRegistrationDto
+import org.sopt.and.data.remote.model.response.ResponseUserRegistrationDto
 
 sealed class SignInState {
     data object Idle : SignInState()

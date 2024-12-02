@@ -4,7 +4,7 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import org.sopt.and.data.repository.TokenRepository
+import org.sopt.and.domain.repository.TokenRepository
 import org.sopt.and.data.repositoryimpl.TokenRepositoryImpl
 import javax.inject.Singleton
 

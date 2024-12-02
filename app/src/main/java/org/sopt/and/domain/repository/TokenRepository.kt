@@ -1,4 +1,4 @@
-package org.sopt.and.data.repository
+package org.sopt.and.domain.repository
 
 interface TokenRepository {
     fun getToken(): String
