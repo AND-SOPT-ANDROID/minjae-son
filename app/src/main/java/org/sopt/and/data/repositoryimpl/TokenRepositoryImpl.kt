@@ -1,6 +1,6 @@
 package org.sopt.and.data.repositoryimpl
 
-import org.sopt.and.data.local.TokenLocalDataSource
+import org.sopt.and.data.local.datasource.TokenLocalDataSource
 import org.sopt.and.domain.repository.TokenRepository
 import javax.inject.Inject
 

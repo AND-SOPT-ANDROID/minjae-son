@@ -6,8 +6,8 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import org.sopt.and.data.local.TokenLocalDataSource
-import org.sopt.and.data.remote.model.response.GetMyHobbyResponseDto
+import org.sopt.and.data.local.datasource.TokenLocalDataSource
+import org.sopt.and.data.remote.model.response.HobbyResponseDto
 import org.sopt.and.di.ServicePool
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,10 +26,10 @@ class MainViewModel @Inject constructor(
     fun getUserHobby() {
         viewModelScope.launch {
             userService.getMyHobby(token = tokenLocalDataSource.token).enqueue(object :
-                Callback<GetMyHobbyResponseDto> {
+                Callback<HobbyResponseDto> {
                 override fun onResponse(
-                    call: Call<GetMyHobbyResponseDto>,
-                    response: Response<GetMyHobbyResponseDto>
+                    call: Call<HobbyResponseDto>,
+                    response: Response<HobbyResponseDto>
                 ) {
                     if (response.isSuccessful) {
                         _userHobbyState.value =
@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
                 }
 
                 override fun onFailure(
-                    call: Call<GetMyHobbyResponseDto>,
+                    call: Call<HobbyResponseDto>,
                     t: Throwable
                 ) {
                     _userHobbyState.value = UserHobbyState.Failure(t.message.toString())

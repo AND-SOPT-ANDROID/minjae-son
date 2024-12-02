@@ -1,5 +1,6 @@
 package org.sopt.and.data.remote.service
 
+import org.sopt.and.data.remote.model.base.ApiResponse
 import org.sopt.and.data.remote.model.request.LoginRequestDto
 import org.sopt.and.data.remote.model.request.UserRegistrationRequestDto
 import org.sopt.and.data.remote.model.response.LoginResponseDto
@@ -12,10 +13,10 @@ interface AuthService {
     @POST("user")
     fun registerUser(
         @Body userRegistrationRequestDto: UserRegistrationRequestDto
-    ): Call<UserRegistrationResponseDto>
+    ): ApiResponse<UserRegistrationResponseDto>
 
     @POST("login")
     fun login(
         @Body loginRequestDto: LoginRequestDto
-    ): Call<LoginResponseDto>
+    ): ApiResponse<LoginResponseDto>
 }
