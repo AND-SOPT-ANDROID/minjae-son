@@ -33,7 +33,7 @@ class AuthViewModel @Inject constructor(
             _signInState.value = result.fold(
                 onSuccess = { token ->
                     tokenRepository.setToken(token.token)
-                    Log.d("token","토큰 저장 완료! 저장값은 ${token.token} 입니다.")
+                    Log.d("token", "토큰 저장 완료! 저장값은 ${token.token} 입니다.")
                     SignInState.Success(token)
                 },
                 onFailure = {
@@ -46,11 +46,13 @@ class AuthViewModel @Inject constructor(
     fun validateSignUp(username: String, password: String, hobby: String) {
         _signUpState.value = SignUpState.Loading
         viewModelScope.launch {
-            val result = authRepository.registerUser(user = User(
-                username = username,
-                password = password,
-                hobby = hobby
-            ))
+            val result = authRepository.registerUser(
+                user = User(
+                    username = username,
+                    password = password,
+                    hobby = hobby
+                )
+            )
             _signUpState.value = result.fold(
                 onSuccess = {
                     SignUpState.Success(it)
@@ -60,5 +62,13 @@ class AuthViewModel @Inject constructor(
                 }
             )
         }
+    }
+
+    fun resetSignInState() {
+        _signInState.value = SignInState.Idle
+    }
+
+    fun resetSignUpState() {
+        _signUpState.value = SignUpState.Idle
     }
 }

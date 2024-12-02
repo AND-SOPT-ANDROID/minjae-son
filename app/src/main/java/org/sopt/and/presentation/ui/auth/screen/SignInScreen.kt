@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.auth.component.AuthTextField
+import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
 import org.sopt.and.presentation.util.showToast
@@ -53,6 +53,7 @@ fun SignInRoute(
 
     SignInScreen(
         signInState = signInState,
+        resetSignInState = { authViewModel.resetSignInState() },
         onSignUpClick = navigateToSignUp,
         onSignInClick = { email, password -> authViewModel.validateSignIn(email, password) },
         navigateToMain = navigateToMain
@@ -62,6 +63,7 @@ fun SignInRoute(
 @Composable
 fun SignInScreen(
     signInState: SignInState,
+    resetSignInState: () -> Unit,
     onSignUpClick: () -> Unit,
     onSignInClick: (String, String) -> Unit,
     navigateToMain: () -> Unit,
@@ -102,7 +104,7 @@ fun SignInScreen(
 
         Spacer(Modifier.height(40.dp))
 
-        AuthTextField(
+        WavveTextField(
             value = inputEmail,
             onValueChange = { newValue -> inputEmail = newValue },
             modifier = Modifier
@@ -112,7 +114,7 @@ fun SignInScreen(
             hint = "이메일 주소 또는 아이디"
         )
         Spacer(Modifier.height(4.dp))
-        AuthTextField(
+        WavveTextField(
             value = inputPassword,
             onValueChange = { newValue -> inputPassword = newValue },
             modifier = Modifier
@@ -215,20 +217,24 @@ fun SignInScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        when(signInState) {
+        when (signInState) {
             is SignInState.Success -> {
                 showToast(
                     context = context,
                     message = "로그인에 성공했습니다."
                 )
+                resetSignInState()
                 navigateToMain()
             }
+
             is SignInState.Failure -> {
                 showToast(
                     context = context,
                     message = "아이디와 비밃번호를 다시 확인해주세요."
                 )
+                resetSignInState()
             }
+
             else -> {}
         }
     }

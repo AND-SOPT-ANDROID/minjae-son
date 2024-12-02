@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.auth.component.AuthTextField
+import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
 import org.sopt.and.presentation.util.showToast
@@ -51,6 +51,7 @@ fun SignUpRoute(
 
     SignUpScreen(
         signUpState = signUpState,
+        resetSignUpState = { authViewModel.resetSignUpState() },
         onSignUpClick = { username, password, hobby -> authViewModel.validateSignUp(username, password, hobby)},
         navigateToSignIn = navigateToSignIn,
         onCancelClick = navigateToBack,
@@ -60,6 +61,7 @@ fun SignUpRoute(
 @Composable
 fun SignUpScreen(
     signUpState: SignUpState,
+    resetSignUpState: () -> Unit,
     onSignUpClick: (String, String, String) -> Unit,
     navigateToSignIn: () -> Unit,
     onCancelClick: () -> Unit,
@@ -131,7 +133,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(18.dp))
 
-            AuthTextField(
+            WavveTextField(
                 value = inputEmail,
                 onValueChange = { newValue -> inputEmail = newValue },
                 modifier = Modifier
@@ -163,7 +165,7 @@ fun SignUpScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            AuthTextField(
+            WavveTextField(
                 value = inputPassword,
                 onValueChange = { newValue -> inputPassword = newValue },
                 modifier = Modifier
@@ -194,7 +196,7 @@ fun SignUpScreen(
                 )
             }
 
-            AuthTextField(
+            WavveTextField(
                 value = inputHobby,
                 onValueChange = { newValue -> inputHobby = newValue },
                 modifier = Modifier
@@ -309,12 +311,14 @@ fun SignUpScreen(
                     message = "회원가입에 성공했습니다. 유저번호는 ${signUpState.result.no}입니다."
                 )
                 navigateToSignIn()
+                resetSignUpState()
             }
             is SignUpState.Failure -> {
                 showToast(
                     context = context,
                     message = "회원가입에 실패했습니다. 형식을 다시 확인해주세요."
                 )
+                resetSignUpState()
             }
             else -> {}
         }

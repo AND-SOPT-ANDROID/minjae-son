@@ -4,10 +4,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import org.sopt.and.presentation.ui.main.screen.HomeScreen
+import org.sopt.and.presentation.ui.main.screen.HomeRoute
 import org.sopt.and.presentation.ui.main.screen.MainRoute
-import org.sopt.and.presentation.ui.main.screen.MyPageScreen
-import org.sopt.and.presentation.ui.main.screen.SearchScreen
+import org.sopt.and.presentation.ui.main.screen.MyPageRoute
+import org.sopt.and.presentation.ui.main.screen.SearchRoute
+import org.sopt.and.presentation.ui.main.screen.SettingRoute
 import org.sopt.and.presentation.ui.navigation.WavveRoute
 
 fun NavGraphBuilder.mainNavGraph(
@@ -19,19 +20,22 @@ fun NavGraphBuilder.mainNavGraph(
     ) {
         composable(route = WavveRoute.MAIN) {
             MainRoute(
-                navigateToHome = { navController.navigateToHome() },
-                navigateToSearch = { navController.navigateToSearch() },
-                navigateToMy = { navController.navigateToMy() }
+                navigateToSetting = { navController.navigateToSetting() }
             )
         }
         composable(route = WavveRoute.HOME) {
-            HomeScreen()
+            HomeRoute()
         }
         composable(route = WavveRoute.SEARCH) {
-            SearchScreen()
+            SearchRoute()
         }
         composable(route = WavveRoute.MY) {
-            MyPageScreen(userHobby = "")
+            MyPageRoute(
+                navigateToSetting = { navController.navigateToSetting() }
+            )
+        }
+        composable(route = WavveRoute.SETTING) {
+            SettingRoute()
         }
     }
 }

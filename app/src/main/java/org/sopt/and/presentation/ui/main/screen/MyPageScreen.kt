@@ -2,6 +2,7 @@ package org.sopt.and.presentation.ui.main.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,10 +31,40 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
 
 @Composable
-fun MyPageScreen(userHobby: String) {
+fun MyPageRoute(
+    mainViewModel: MainViewModel = hiltViewModel(),
+    navigateToSetting: () -> Unit
+) {
+    val userHobbyState by mainViewModel.userHobbyState.collectAsState()
+    var userHobby by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        mainViewModel.getUserHobby()
+    }
+
+    when (userHobbyState) {
+        is UserHobbyState.Success -> {
+            userHobby = (userHobbyState as UserHobbyState.Success).result.hobby
+        }
+
+        else -> {}
+    }
+
+    MyPageScreen(
+        userHobby = userHobby,
+        navigateToSetting = navigateToSetting
+    )
+}
+
+@Composable
+fun MyPageScreen(
+    userHobby: String,
+    navigateToSetting: () -> Unit,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -67,6 +104,7 @@ fun MyPageScreen(userHobby: String) {
                 modifier = Modifier
                     .padding(8.dp)
                     .size(28.dp)
+                    .clickable(onClick = navigateToSetting)
             )
         }
 

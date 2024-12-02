@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.main.component.CategoryItem
@@ -40,6 +41,13 @@ import org.sopt.and.presentation.ui.main.component.bannerImages
 import org.sopt.and.presentation.ui.main.component.editorRecommendationImages
 import org.sopt.and.presentation.ui.main.component.todayTop20Images
 import org.sopt.and.ui.theme.ANDANDROIDTheme
+
+@Composable
+fun HomeRoute(
+    mainViewModel: MainViewModel = hiltViewModel()
+) {
+    HomeScreen()
+}
 
 @Composable
 fun HomeScreen() {
