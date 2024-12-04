@@ -4,14 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +53,7 @@ fun SearchScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(color = Color(0xFF121212))
-            .padding(30.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -64,39 +62,36 @@ fun SearchScreen(
             fontSize = 20.sp,
             color = Color(0xFFCCCCCC)
         )
-        Row(
-            modifier = Modifier.padding(bottom = 100.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            WavveTextField(
-                value = inputSearch,
-                onValueChange = { newValue -> inputSearch = newValue },
-                modifier = Modifier
-                    .weight(1f)
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = Color(0XFF3B5999)),
-                hint = "검색할 userNo을 입력하세요"
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Box(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .clip(shape = RoundedCornerShape(8.dp))
-                    .background(color = if (isInputAvailable) Color.Green else Color.Red)
-                    .clickable(
-                        enabled = isInputAvailable,
-                        onClick = { onSearchClick(inputSearch) }
-                    ),
-                contentAlignment = Alignment.Center,
-                content = {
-                    Text(
-                        text = "검색하기",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 16.dp),
-                        fontSize = 14.sp
-                    )
-                }
-            )
-        }
+        WavveTextField(
+            value = inputSearch,
+            onValueChange = { newValue -> inputSearch = newValue },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(shape = RoundedCornerShape(6.dp))
+                .background(color = Color(0xFF262626)),
+            hint = "검색할 번호 입력"
+        )
+        Spacer(Modifier.height(24.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .clip(shape = RoundedCornerShape(20.dp))
+                .background(color = Color(0xFF1352F9))
+                .clickable(
+                    enabled = isInputAvailable,
+                    onClick = { onSearchClick(inputSearch) }
+                ),
+            contentAlignment = Alignment.Center,
+            content = {
+                Text(
+                    text = "검색하기",
+                    modifier = Modifier.padding(vertical = 12.dp),
+                    color = Color.White
+                )
+            }
+        )
+        Spacer(Modifier.height(100.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth()
