@@ -33,14 +33,16 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 
 @Composable
 fun SettingRoute(
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    navigateToMyPage: () -> Unit
 ) {
     val userInfoUpdateState by mainViewModel.userInfoUpdateState.collectAsState()
 
     SettingScreen(
         userInfoUpdateState = userInfoUpdateState,
         resetUserInfoUpdateState = { mainViewModel.resetUserInfoUpdateState() },
-        onUserInfoChangeClick = { password, hobby -> mainViewModel.updateUserInfo(password, hobby) }
+        onUserInfoChangeClick = { password, hobby -> mainViewModel.updateUserInfo(password, hobby) },
+        navigateToMyPage = navigateToMyPage
     )
 }
 
@@ -48,7 +50,8 @@ fun SettingRoute(
 fun SettingScreen(
     userInfoUpdateState: UserInfoUpdateState,
     resetUserInfoUpdateState: () -> Unit,
-    onUserInfoChangeClick: (String?, String?) -> Unit
+    onUserInfoChangeClick: (String?, String?) -> Unit,
+    navigateToMyPage: () -> Unit
 ) {
     val context = LocalContext.current
     var inputPassword by remember { mutableStateOf("") }
@@ -118,6 +121,7 @@ fun SettingScreen(
                     message = "회원정보 변경에 성공했습니다."
                 )
                 resetUserInfoUpdateState()
+                navigateToMyPage()
             }
 
             is UserInfoUpdateState.Failure -> {
@@ -140,7 +144,8 @@ fun ShowSettingScreen() {
         SettingScreen(
             userInfoUpdateState = UserInfoUpdateState.Idle,
             resetUserInfoUpdateState = {},
-            onUserInfoChangeClick = { _, _ -> }
+            onUserInfoChangeClick = { _, _ -> },
+            navigateToMyPage = {}
         )
     }
 }

@@ -35,7 +35,9 @@ fun NavGraphBuilder.mainNavGraph(
             )
         }
         composable(route = WavveRoute.SETTING) {
-            SettingRoute()
+            SettingRoute(
+                navigateToMyPage = { navController.navigateToMy() }
+            )
         }
     }
 }

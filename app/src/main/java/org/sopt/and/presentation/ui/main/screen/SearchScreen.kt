@@ -77,7 +77,7 @@ fun SearchScreen(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .clip(shape = RoundedCornerShape(20.dp))
-                .background(color = Color(0xFF1352F9))
+                .background(color = if(isInputAvailable) Color(0xFF1352F9) else Color.Gray)
                 .clickable(
                     enabled = isInputAvailable,
                     onClick = { onSearchClick(inputSearch) }
