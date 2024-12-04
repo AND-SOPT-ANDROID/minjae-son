@@ -93,13 +93,14 @@ fun SettingScreen(
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .clip(shape = RoundedCornerShape(20.dp))
-                .background(color = Color(0xFF1352F9))
+                .background(color = if(isButtonEnabled) Color(0xFF1352F9) else Color.Gray)
                 .clickable(
                     enabled = isButtonEnabled,
                     onClick = {
                         if (inputPassword.isBlank()) onUserInfoChangeClick(null, inputHobby)
                         else if (inputHobby.isBlank()) onUserInfoChangeClick(inputPassword, null)
-                        else onUserInfoChangeClick(inputPassword, inputHobby) }
+                        else onUserInfoChangeClick(inputPassword, inputHobby)
+                    }
                 ),
             contentAlignment = Alignment.Center,
             content = {
