@@ -5,6 +5,7 @@ import org.sopt.and.data.remote.model.base.ApiResponse
 import org.sopt.and.data.remote.model.request.UserInfoUpdateRequestDto
 import org.sopt.and.data.remote.model.response.HobbyResponseDto
 import org.sopt.and.data.remote.service.UserService
+import retrofit2.Response
 import javax.inject.Inject
 
 class UserRemoteDataSourceImpl @Inject constructor(
@@ -20,6 +21,6 @@ class UserRemoteDataSourceImpl @Inject constructor(
     override suspend fun updateUserInfo(
         token: String,
         userInfoUpdateRequestDto: UserInfoUpdateRequestDto
-    ): ApiResponse<Unit> =
+    ): Response<Unit> =
         userService.updateUserInfo(token = token, userInfoUpdateRequestDto = userInfoUpdateRequestDto)
 }

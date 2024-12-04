@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource
-): UserRepository {
+) : UserRepository {
     override suspend fun getMyHobby(token: String): Result<Hobby> {
         return runCatching {
             userRemoteDataSource.getMyHobby(token = token).handleApiResponse().getOrThrow().toDomain()
@@ -29,10 +29,18 @@ class UserRepositoryImpl @Inject constructor(
         hobby: String?
     ): Result<Unit> {
         return runCatching {
-            userRemoteDataSource.updateUserInfo(token = token, userInfoUpdateRequestDto = UserInfoUpdateRequestDto(
-                password = password,
-                hobby = hobby
-            )).handleApiResponse().getOrThrow()
+            val response = userRemoteDataSource.updateUserInfo(
+                token = token,
+                userInfoUpdateRequestDto = UserInfoUpdateRequestDto(
+                    password = password,
+                    hobby = hobby
+                )
+            )
+            if(response.isSuccessful) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("Error : ${response.code()} ${response.message()}"))
+            }
         }
     }
 }
