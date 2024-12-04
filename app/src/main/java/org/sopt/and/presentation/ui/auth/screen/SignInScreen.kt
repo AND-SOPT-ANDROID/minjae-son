@@ -55,7 +55,7 @@ fun SignInRoute(
         signInState = signInState,
         resetSignInState = { authViewModel.resetSignInState() },
         onSignUpClick = navigateToSignUp,
-        onSignInClick = { email, password -> authViewModel.validateSignIn(email, password) },
+        onSignInClick = { username, password -> authViewModel.validateSignIn(username, password) },
         navigateToMain = navigateToMain
     )
 }
@@ -230,7 +230,7 @@ fun SignInScreen(
             is SignInState.Failure -> {
                 showToast(
                     context = context,
-                    message = "아이디와 비밃번호를 다시 확인해주세요."
+                    message = "아이디와 비밀번호를 다시 확인해주세요."
                 )
                 resetSignInState()
             }
