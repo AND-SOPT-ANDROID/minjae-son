@@ -12,4 +12,5 @@ object WavveRoute {
     const val HOME = "home"
     const val SEARCH = "search"
     const val MY = "my"
+    const val SETTING = "setting"
 }

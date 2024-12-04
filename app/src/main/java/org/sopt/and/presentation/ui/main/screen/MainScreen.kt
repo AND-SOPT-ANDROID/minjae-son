@@ -35,24 +35,16 @@ import org.sopt.and.ui.theme.ANDANDROIDTheme
 @Composable
 fun MainRoute(
     mainViewModel: MainViewModel = hiltViewModel(),
-    navigateToHome: () -> Unit,
-    navigateToSearch: () -> Unit,
-    navigateToMy: () -> Unit,
+    navigateToSetting: () -> Unit
 ) {
-    val userHobbyState by mainViewModel.userHobbyState.collectAsState()
-
-    LaunchedEffect(Unit) {
-        mainViewModel.getUserHobby()
-    }
-
     MainScreen(
-        userHobbyState = userHobbyState,
+        navigateToSetting = navigateToSetting
     )
 }
 
 @Composable
 fun MainScreen(
-    userHobbyState: UserHobbyState,
+    navigateToSetting: ()-> Unit
 ) {
     var selectedTab by remember { mutableStateOf<MainTabList>(MainTabList.HOME) }
     val onTabSelected: (MainTabList) -> Unit = { tab ->
@@ -144,22 +136,11 @@ fun MainScreen(
                     .padding(innerPadding)
             ) {
                 when (selectedTab) {
-                    MainTabList.HOME -> HomeScreen()
-                    MainTabList.SEARCH -> SearchScreen()
-                    MainTabList.MY -> {
-                        when (userHobbyState) {
-                            is UserHobbyState.Success -> {
-                                val userHobby = userHobbyState.hobby
-                                MyPageScreen(userHobby = userHobby)
-                            }
-
-                            is UserHobbyState.Failure -> {
-                                val errorMessage = userHobbyState.errorMessage
-                            }
-
-                            else -> {}
-                        }
-                    }
+                    MainTabList.HOME -> HomeRoute()
+                    MainTabList.SEARCH -> SearchRoute()
+                    MainTabList.MY -> MyPageRoute(
+                        navigateToSetting = navigateToSetting
+                    )
                 }
             }
 

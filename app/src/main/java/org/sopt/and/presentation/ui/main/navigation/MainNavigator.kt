@@ -18,3 +18,7 @@ fun NavController.navigateToSearch() {
 fun NavController.navigateToMy() {
     navigate(WavveRoute.MY)
 }
+
+fun NavController.navigateToSetting() {
+    navigate(WavveRoute.SETTING)
+}

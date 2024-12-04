@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.auth.component.AuthTextField
+import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
 import org.sopt.and.presentation.util.showToast
@@ -49,36 +49,26 @@ fun SignInRoute(
     navigateToSignUp: () -> Unit,
     navigateToMain: () -> Unit,
 ) {
-    val context = LocalContext.current
     val signInState by authViewModel.signInState.collectAsState()
 
-    val onSignInClick: (String, String) -> Unit = { email, password ->
-        authViewModel.validateSignIn(email, password)
-        when (signInState) {
-            is SignInState.Success -> {
-                showToast(context = context, message = "로그인에 성공했습니다.")
-                navigateToMain()
-            }
-
-            is SignInState.Failure -> {
-                showToast(context = context, message = "로그인에 실패했습니다.")
-            }
-
-            else -> {}
-        }
-    }
-
     SignInScreen(
+        signInState = signInState,
+        resetSignInState = { authViewModel.resetSignInState() },
         onSignUpClick = navigateToSignUp,
-        onSignInClick = onSignInClick,
+        onSignInClick = { username, password -> authViewModel.validateSignIn(username, password) },
+        navigateToMain = navigateToMain
     )
 }
 
 @Composable
 fun SignInScreen(
+    signInState: SignInState,
+    resetSignInState: () -> Unit,
     onSignUpClick: () -> Unit,
-    onSignInClick: (String, String) -> Unit
+    onSignInClick: (String, String) -> Unit,
+    navigateToMain: () -> Unit,
 ) {
+    val context = LocalContext.current
     var inputEmail by remember { mutableStateOf("") }
     var inputPassword by remember { mutableStateOf("") }
 
@@ -114,7 +104,7 @@ fun SignInScreen(
 
         Spacer(Modifier.height(40.dp))
 
-        AuthTextField(
+        WavveTextField(
             value = inputEmail,
             onValueChange = { newValue -> inputEmail = newValue },
             modifier = Modifier
@@ -124,7 +114,7 @@ fun SignInScreen(
             hint = "이메일 주소 또는 아이디"
         )
         Spacer(Modifier.height(4.dp))
-        AuthTextField(
+        WavveTextField(
             value = inputPassword,
             onValueChange = { newValue -> inputPassword = newValue },
             modifier = Modifier
@@ -139,8 +129,7 @@ fun SignInScreen(
 
         Button(
             onClick = { onSignInClick(inputEmail, inputPassword) },
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color(0xFF0F42C7))
         ) {
             Text(
@@ -227,6 +216,27 @@ fun SignInScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        when (signInState) {
+            is SignInState.Success -> {
+                showToast(
+                    context = context,
+                    message = "로그인에 성공했습니다."
+                )
+                resetSignInState()
+                navigateToMain()
+            }
+
+            is SignInState.Failure -> {
+                showToast(
+                    context = context,
+                    message = "아이디와 비밀번호를 다시 확인해주세요."
+                )
+                resetSignInState()
+            }
+
+            else -> {}
+        }
     }
 }
 

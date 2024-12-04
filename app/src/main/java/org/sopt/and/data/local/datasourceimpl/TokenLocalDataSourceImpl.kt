@@ -1,6 +1,7 @@
-package org.sopt.and.data.local
+package org.sopt.and.data.local.datasourceimpl
 
 import android.content.SharedPreferences
+import org.sopt.and.data.local.datasource.TokenLocalDataSource
 import javax.inject.Inject
 
 class TokenLocalDataSourceImpl @Inject constructor(
