@@ -23,12 +23,13 @@ class MainViewModel @Inject constructor(
     private val _hobbySearchState = MutableStateFlow<HobbySearchState>(HobbySearchState.Idle)
     val hobbySearchState: StateFlow<HobbySearchState> = _hobbySearchState
 
-    private val _userInfoUpdateState = MutableStateFlow<UserInfoUpdateState>(UserInfoUpdateState.Idle)
+    private val _userInfoUpdateState =
+        MutableStateFlow<UserInfoUpdateState>(UserInfoUpdateState.Idle)
     val userInfoUpdateState: StateFlow<UserInfoUpdateState> = _userInfoUpdateState
 
     fun getUserHobby() {
-        _userHobbyState.value = UserHobbyState.Loading
         viewModelScope.launch {
+            _userHobbyState.value = UserHobbyState.Loading
             val result = userRepository.getMyHobby(token = token)
             _userHobbyState.value = result.fold(
                 onSuccess = {
@@ -42,8 +43,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun getOthersHobby(userNo: String) {
-        _hobbySearchState.value = HobbySearchState.Loading
         viewModelScope.launch {
+            _hobbySearchState.value = HobbySearchState.Loading
             val result = userRepository.getOthersHobby(
                 token = token,
                 userNo = userNo.toInt()
@@ -60,8 +61,8 @@ class MainViewModel @Inject constructor(
     }
 
     fun updateUserInfo(password: String?, hobby: String?) {
-        _userInfoUpdateState.value = UserInfoUpdateState.Loading
         viewModelScope.launch {
+            _userInfoUpdateState.value = UserInfoUpdateState.Loading
             val result = userRepository.updateUserInfo(
                 token = token,
                 password = password,
