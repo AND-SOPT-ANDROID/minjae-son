@@ -18,6 +18,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +37,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
 import org.sopt.and.R
 import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
@@ -49,23 +53,35 @@ fun SignInRoute(
     navigateToSignUp: () -> Unit,
     navigateToMain: () -> Unit,
 ) {
-    val signInState by authViewModel.signInState.collectAsState()
+    val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val lifecycleOwner = LocalLifecycleOwner.current
+
+    LaunchedEffect(authViewModel.sideEffect, lifecycleOwner) {
+        authViewModel.sideEffect.flowWithLifecycle(lifecycle = lifecycleOwner.lifecycle)
+            .collect { authSideEffect ->
+                when(authSideEffect) {
+                    is AuthContract.AuthSideEffect.NavigateToSignUp -> navigateToSignUp()
+                    is AuthContract.AuthSideEffect.NavigateToMain -> navigateToMain()
+                    else -> {}
+                }
+            }
+    }
 
     SignInScreen(
-        signInState = signInState,
+        uiState = uiState,
         resetSignInState = { authViewModel.resetSignInState() },
-        onSignUpClick = navigateToSignUp,
-        onSignInClick = { username, password -> authViewModel.validateSignIn(username, password) },
-        navigateToMain = navigateToMain
+        onSignUpClick = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignUp) },
+        onSignInClick = { authViewModel.validateSignIn() },
+        navigateToMain = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToMain) }
     )
 }
 
 @Composable
 fun SignInScreen(
-    signInState: SignInState,
+    uiState: AuthContract.AuthUiState,
     resetSignInState: () -> Unit,
     onSignUpClick: () -> Unit,
-    onSignInClick: (String, String) -> Unit,
+    onSignInClick: () -> Unit,
     navigateToMain: () -> Unit,
 ) {
     val context = LocalContext.current
