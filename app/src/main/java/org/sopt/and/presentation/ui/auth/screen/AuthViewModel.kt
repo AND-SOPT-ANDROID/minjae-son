@@ -1,6 +1,5 @@
 package org.sopt.and.presentation.ui.auth.screen
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

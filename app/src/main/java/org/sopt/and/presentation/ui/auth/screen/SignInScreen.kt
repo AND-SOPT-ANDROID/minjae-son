@@ -1,6 +1,5 @@
 package org.sopt.and.presentation.ui.auth.screen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,8 +20,6 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,9 +37,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.util.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
@@ -59,26 +56,32 @@ fun SignInRoute(
     LaunchedEffect(authViewModel.sideEffect, lifecycleOwner) {
         authViewModel.sideEffect.flowWithLifecycle(lifecycle = lifecycleOwner.lifecycle)
             .collect { authSideEffect ->
-                when(authSideEffect) {
+                when (authSideEffect) {
                     is AuthContract.AuthSideEffect.NavigateToSignUp -> navigateToSignUp()
                     is AuthContract.AuthSideEffect.NavigateToMain -> navigateToMain()
-                    is AuthContract.AuthSideEffect.ShowToast -> showToast(context = context, message = authSideEffect.message)
+                    is AuthContract.AuthSideEffect.ShowToast -> showToast(
+                        context = context,
+                        message = authSideEffect.message
+                    )
+
                     else -> {}
                 }
             }
     }
 
     LaunchedEffect(authUiState.signInState) {
-        when(authUiState.signInState) {
+        when (authUiState.signInState) {
             is SignInState.Success -> {
                 authViewModel.setSideEffect(AuthContract.AuthSideEffect.ShowToast(message = "로그인에 성공하였습니다."))
                 authViewModel.setEvent(AuthContract.AuthEvent.ResetSignInState)
                 authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToMain)
             }
+
             is SignInState.Failure -> {
                 authViewModel.setSideEffect(AuthContract.AuthSideEffect.ShowToast(message = "아이디와 비밀번호를 다시 확인해주세요."))
                 authViewModel.setEvent(AuthContract.AuthEvent.ResetSignInState)
             }
+
             else -> {}
         }
     }
@@ -235,7 +238,8 @@ fun SignInScreen(
                 color = Color(0xFF5D5D5D)
             )
             Text(
-                text = "SNS계정으로 간편하게 가입하여 서비스를 이용하실 수 있습니다.\n기존 POOQ 계정 또는 Wavve 계정과는 연동되지 않으니 이용에 참고하세요",
+                text = "SNS계정으로 간편하게 가입하여 서비스를 이용하실 수 있습니다.\n" +
+                        "기존 POOQ 계정 또는 Wavve 계정과는 연동되지 않으니 이용에 참고하세요",
                 modifier = Modifier.fillMaxWidth(),
                 fontSize = 10.sp,
                 lineHeight = 14.sp,

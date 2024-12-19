@@ -18,9 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,9 +35,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.flowWithLifecycle
 import org.sopt.and.R
-import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformIconRow
 import org.sopt.and.presentation.ui.auth.component.SocialPlatformList
+import org.sopt.and.presentation.ui.common.WavveTextField
 import org.sopt.and.presentation.util.showToast
 import org.sopt.and.ui.theme.ANDANDROIDTheme
 
@@ -57,16 +54,20 @@ fun SignUpRoute(
     LaunchedEffect(authViewModel.sideEffect, lifecycleOwner) {
         authViewModel.sideEffect.flowWithLifecycle(lifecycle = lifecycleOwner.lifecycle)
             .collect { authSideEffect ->
-                when(authSideEffect) {
+                when (authSideEffect) {
                     is AuthContract.AuthSideEffect.NavigateToSignIn -> navigateToSignIn()
-                    is AuthContract.AuthSideEffect.ShowToast -> showToast(context = context, message = authSideEffect.message)
+                    is AuthContract.AuthSideEffect.ShowToast -> showToast(
+                        context = context,
+                        message = authSideEffect.message
+                    )
+
                     else -> {}
                 }
             }
     }
 
     LaunchedEffect(authUiState.signUpState) {
-        when(authUiState.signUpState) {
+        when (authUiState.signUpState) {
             is SignUpState.Success -> {
                 authViewModel.setSideEffect(
                     AuthContract.AuthSideEffect.ShowToast(message = "회원가입에 성공했습니다. 유저번호는 ${(authUiState.signUpState as SignUpState.Success).result.no}입니다.")
@@ -74,12 +75,14 @@ fun SignUpRoute(
                 authViewModel.setEvent(AuthContract.AuthEvent.ResetSignUpState)
                 authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignIn)
             }
+
             is SignUpState.Failure -> {
                 authViewModel.setSideEffect(
                     AuthContract.AuthSideEffect.ShowToast(message = "회원가입에 실패했습니다. 형식을 다시 확인해주세요.")
                 )
                 authViewModel.setEvent(AuthContract.AuthEvent.ResetSignUpState)
             }
+
             else -> {}
         }
     }
