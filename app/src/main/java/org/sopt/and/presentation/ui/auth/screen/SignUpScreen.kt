@@ -17,7 +17,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,41 +50,59 @@ fun SignUpRoute(
     navigateToSignIn: () -> Unit,
     navigateToBack: () -> Unit,
 ) {
-    val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     LaunchedEffect(authViewModel.sideEffect, lifecycleOwner) {
         authViewModel.sideEffect.flowWithLifecycle(lifecycle = lifecycleOwner.lifecycle)
             .collect { authSideEffect ->
                 when(authSideEffect) {
                     is AuthContract.AuthSideEffect.NavigateToSignIn -> navigateToSignIn()
+                    is AuthContract.AuthSideEffect.ShowToast -> showToast(context = context, message = authSideEffect.message)
                     else -> {}
                 }
             }
     }
 
+    LaunchedEffect(authUiState.signUpState) {
+        when(authUiState.signUpState) {
+            is SignUpState.Success -> {
+                authViewModel.setSideEffect(
+                    AuthContract.AuthSideEffect.ShowToast(message = "회원가입에 성공했습니다. 유저번호는 ${(authUiState.signUpState as SignUpState.Success).result.no}입니다.")
+                )
+                authViewModel.setEvent(AuthContract.AuthEvent.ResetSignUpState)
+                authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignIn)
+            }
+            is SignUpState.Failure -> {
+                authViewModel.setSideEffect(
+                    AuthContract.AuthSideEffect.ShowToast(message = "회원가입에 실패했습니다. 형식을 다시 확인해주세요.")
+                )
+                authViewModel.setEvent(AuthContract.AuthEvent.ResetSignUpState)
+            }
+            else -> {}
+        }
+    }
+
     SignUpScreen(
-        signUpState = signUpState,
-        resetSignUpState = { authViewModel.resetSignUpState() },
-        onSignUpClick = { username, password, hobby -> authViewModel.validateSignUp(username, password, hobby)},
-        navigateToSignIn = navigateToSignIn,
-        onCancelClick = navigateToBack,
+        authUiState = authUiState,
+        updateSignUpUsername = { input -> authViewModel.updateSignUpUsername(input) },
+        updateSignUpPassword = { input -> authViewModel.updateSignUpPassword(input) },
+        updateSignUpHobby = { input -> authViewModel.updateSignUpHobby(input) },
+        onSignUpClick = { authViewModel.validateSignUp() },
+        onCancelClick = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignIn) },
     )
 }
 
 @Composable
 fun SignUpScreen(
-    signUpState: SignUpState,
-    resetSignUpState: () -> Unit,
-    onSignUpClick: (String, String, String) -> Unit,
-    navigateToSignIn: () -> Unit,
+    authUiState: AuthContract.AuthUiState,
+    updateSignUpUsername: (String) -> Unit,
+    updateSignUpPassword: (String) -> Unit,
+    updateSignUpHobby: (String) -> Unit,
+    onSignUpClick: () -> Unit,
     onCancelClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var inputEmail by remember { mutableStateOf("") }
-    var inputPassword by remember { mutableStateOf("") }
-    var inputHobby by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -149,8 +166,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(18.dp))
 
             WavveTextField(
-                value = inputEmail,
-                onValueChange = { newValue -> inputEmail = newValue },
+                value = authUiState.signUpUsername,
+                onValueChange = updateSignUpUsername,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
@@ -181,8 +198,8 @@ fun SignUpScreen(
             Spacer(modifier = Modifier.height(10.dp))
 
             WavveTextField(
-                value = inputPassword,
-                onValueChange = { newValue -> inputPassword = newValue },
+                value = authUiState.signUpPassword,
+                onValueChange = updateSignUpPassword,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
@@ -212,8 +229,8 @@ fun SignUpScreen(
             }
 
             WavveTextField(
-                value = inputHobby,
-                onValueChange = { newValue -> inputHobby = newValue },
+                value = authUiState.signUpHobby,
+                onValueChange = updateSignUpHobby,
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape = RoundedCornerShape(4.dp))
@@ -309,7 +326,7 @@ fun SignUpScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = Color(0xFF0F42C7))
-                .clickable(onClick = { onSignUpClick(inputEmail, inputPassword, inputHobby) }),
+                .clickable(onClick = onSignUpClick),
             contentAlignment = Alignment.Center
         ) {
             Text(
@@ -317,25 +334,6 @@ fun SignUpScreen(
                 modifier = Modifier.padding(10.dp),
                 color = Color.White
             )
-        }
-
-        when(signUpState) {
-            is SignUpState.Success -> {
-                showToast(
-                    context = context,
-                    message = "회원가입에 성공했습니다. 유저번호는 ${signUpState.result.no}입니다."
-                )
-                navigateToSignIn()
-                resetSignUpState()
-            }
-            is SignUpState.Failure -> {
-                showToast(
-                    context = context,
-                    message = "회원가입에 실패했습니다. 형식을 다시 확인해주세요."
-                )
-                resetSignUpState()
-            }
-            else -> {}
         }
     }
 }

@@ -1,5 +1,6 @@
 package org.sopt.and.presentation.ui.auth.screen
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,16 +19,45 @@ class AuthViewModel @Inject constructor(
 
     override suspend fun handleEvent(event: AuthContract.AuthEvent) {
         when (event) {
+            is AuthContract.AuthEvent.UpdateSignInUsername -> setState {
+                copy(signInUsername = event.signInUsername)
+            }
+            is AuthContract.AuthEvent.UpdateSignInPassword -> setState {
+                copy(signInPassword = event.signInPassword)
+            }
             is AuthContract.AuthEvent.OnSignInClicked -> setState {
-                copy(
-                    signInState = event.signInState,
-                )
+                copy(signInState = event.signInState)
+            }
+            is AuthContract.AuthEvent.ResetSignInState -> setState {
+                copy(signInState = SignInState.Idle)
+            }
+            is AuthContract.AuthEvent.UpdateSignUpUsername -> setState {
+                copy(signUpUsername = event.signUpUsername)
+            }
+            is AuthContract.AuthEvent.UpdateSignUpPassword -> setState {
+                copy(signUpPassword = event.signUpPassword)
+            }
+            is AuthContract.AuthEvent.UpdateSignUpHobby -> setState {
+                copy(signUpHobby = event.signUpHobby)
             }
             is AuthContract.AuthEvent.OnSignUpClicked -> setState {
-                copy(
-                    signUpState = event.signUpState,
-                )
+                copy(signUpState = event.signUpState)
             }
+            is AuthContract.AuthEvent.ResetSignUpState -> setState {
+                copy(signUpState = SignUpState.Idle)
+            }
+        }
+    }
+
+    fun updateSignInUsername(input: String) {
+        viewModelScope.launch {
+            setEvent(AuthContract.AuthEvent.UpdateSignInUsername(signInUsername = input))
+        }
+    }
+
+    fun updateSignInPassword(input: String) {
+        viewModelScope.launch {
+            setEvent(AuthContract.AuthEvent.UpdateSignInPassword(signInPassword = input))
         }
     }
 
@@ -43,6 +73,24 @@ class AuthViewModel @Inject constructor(
                     setEvent(AuthContract.AuthEvent.OnSignInClicked(signInState = SignInState.Failure(errorMessage = it.localizedMessage?: "")))
                 }
             )
+        }
+    }
+
+    fun updateSignUpUsername(input: String) {
+        viewModelScope.launch {
+            setEvent(AuthContract.AuthEvent.UpdateSignUpUsername(signUpUsername = input))
+        }
+    }
+
+    fun updateSignUpPassword(input: String) {
+        viewModelScope.launch {
+            setEvent(AuthContract.AuthEvent.UpdateSignUpPassword(signUpPassword = input))
+        }
+    }
+
+    fun updateSignUpHobby(input: String) {
+        viewModelScope.launch {
+            setEvent(AuthContract.AuthEvent.UpdateSignUpHobby(signUpHobby = input))
         }
     }
 
@@ -65,12 +113,4 @@ class AuthViewModel @Inject constructor(
             )
         }
     }
-
-//    fun resetSignInState() {
-//        _signInState.value = SignInState.Idle
-//    }
-//
-//    fun resetSignUpState() {
-//        _signUpState.value = SignUpState.Idle
-//    }
 }

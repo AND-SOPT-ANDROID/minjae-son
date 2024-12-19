@@ -1,5 +1,6 @@
 package org.sopt.and.presentation.ui.auth.screen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,11 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,8 +52,9 @@ fun SignInRoute(
     navigateToSignUp: () -> Unit,
     navigateToMain: () -> Unit,
 ) {
-    val uiState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val authUiState by authViewModel.uiState.collectAsStateWithLifecycle()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
 
     LaunchedEffect(authViewModel.sideEffect, lifecycleOwner) {
         authViewModel.sideEffect.flowWithLifecycle(lifecycle = lifecycleOwner.lifecycle)
@@ -62,32 +62,44 @@ fun SignInRoute(
                 when(authSideEffect) {
                     is AuthContract.AuthSideEffect.NavigateToSignUp -> navigateToSignUp()
                     is AuthContract.AuthSideEffect.NavigateToMain -> navigateToMain()
+                    is AuthContract.AuthSideEffect.ShowToast -> showToast(context = context, message = authSideEffect.message)
                     else -> {}
                 }
             }
     }
 
+    LaunchedEffect(authUiState.signInState) {
+        when(authUiState.signInState) {
+            is SignInState.Success -> {
+                authViewModel.setSideEffect(AuthContract.AuthSideEffect.ShowToast(message = "로그인에 성공하였습니다."))
+                authViewModel.setEvent(AuthContract.AuthEvent.ResetSignInState)
+                authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToMain)
+            }
+            is SignInState.Failure -> {
+                authViewModel.setSideEffect(AuthContract.AuthSideEffect.ShowToast(message = "아이디와 비밀번호를 다시 확인해주세요."))
+                authViewModel.setEvent(AuthContract.AuthEvent.ResetSignInState)
+            }
+            else -> {}
+        }
+    }
+
     SignInScreen(
-        uiState = uiState,
-        resetSignInState = { authViewModel.resetSignInState() },
-        onSignUpClick = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignUp) },
+        authUiState = authUiState,
+        updateSignInUsername = { input -> authViewModel.updateSignInUsername(input) },
+        updateSignInPassword = { input -> authViewModel.updateSignInPassword(input) },
         onSignInClick = { authViewModel.validateSignIn() },
-        navigateToMain = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToMain) }
+        onSignUpClick = { authViewModel.setSideEffect(AuthContract.AuthSideEffect.NavigateToSignUp) },
     )
 }
 
 @Composable
 fun SignInScreen(
-    uiState: AuthContract.AuthUiState,
-    resetSignInState: () -> Unit,
-    onSignUpClick: () -> Unit,
+    authUiState: AuthContract.AuthUiState,
+    updateSignInUsername: (String) -> Unit,
+    updateSignInPassword: (String) -> Unit,
     onSignInClick: () -> Unit,
-    navigateToMain: () -> Unit,
+    onSignUpClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-    var inputEmail by remember { mutableStateOf("") }
-    var inputPassword by remember { mutableStateOf("") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -121,8 +133,8 @@ fun SignInScreen(
         Spacer(Modifier.height(40.dp))
 
         WavveTextField(
-            value = inputEmail,
-            onValueChange = { newValue -> inputEmail = newValue },
+            value = authUiState.signInUsername,
+            onValueChange = updateSignInUsername,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(6.dp))
@@ -131,8 +143,8 @@ fun SignInScreen(
         )
         Spacer(Modifier.height(4.dp))
         WavveTextField(
-            value = inputPassword,
-            onValueChange = { newValue -> inputPassword = newValue },
+            value = authUiState.signInPassword,
+            onValueChange = updateSignInPassword,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(shape = RoundedCornerShape(6.dp))
@@ -144,7 +156,7 @@ fun SignInScreen(
         Spacer(Modifier.height(30.dp))
 
         Button(
-            onClick = { onSignInClick(inputEmail, inputPassword) },
+            onClick = onSignInClick,
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(Color(0xFF0F42C7))
         ) {
@@ -232,27 +244,6 @@ fun SignInScreen(
         }
 
         Spacer(modifier = Modifier.weight(1f))
-
-        when (signInState) {
-            is SignInState.Success -> {
-                showToast(
-                    context = context,
-                    message = "로그인에 성공했습니다."
-                )
-                resetSignInState()
-                navigateToMain()
-            }
-
-            is SignInState.Failure -> {
-                showToast(
-                    context = context,
-                    message = "아이디와 비밀번호를 다시 확인해주세요."
-                )
-                resetSignInState()
-            }
-
-            else -> {}
-        }
     }
 }
 
